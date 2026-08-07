@@ -1,0 +1,6 @@
+{
+  "name": "SSR Tuition Management System",
+  "description": "Comprehensive Tuition Management System and Public Portal for SSR Tuition featuring Teacher, Student, and Parent portals with Homework, Attendance, Online Classes, Fees, and Progress tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
