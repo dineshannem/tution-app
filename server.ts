@@ -765,7 +765,39 @@ app.post("/api/students", (req, res) => {
     ...req.body
   };
   db.students.push(newStudent);
+  createStudentAndParentCredentials(newStudent);
   res.json({ success: true, student: newStudent });
+});
+
+app.post("/api/admission-requests/:id/approve", (req, res) => {
+  const admission = db.admissionRequests.find(a => a.id === req.params.id);
+  if (!admission) {
+    return res.status(404).json({ success: false, error: "Admission request not found." });
+  }
+  if (admission.status === 'approved') {
+    return res.json({ success: true, admission });
+  }
+  admission.status = 'approved';
+  const student = convertAdmissionToStudent(admission);
+  res.json({ success: true, admission, student });
+});
+
+app.post("/api/admission-requests/:id/reject", (req, res) => {
+  const admission = db.admissionRequests.find(a => a.id === req.params.id);
+  if (!admission) {
+    return res.status(404).json({ success: false, error: "Admission request not found." });
+  }
+  admission.status = 'rejected';
+  res.json({ success: true, admission });
+});
+
+app.post("/api/demo-requests/:id/confirm", (req, res) => {
+  const demo = db.demoRegistrations.find(d => d.id === req.params.id);
+  if (!demo) {
+    return res.status(404).json({ success: false, error: "Demo request not found." });
+  }
+  demo.status = 'contacted';
+  res.json({ success: true, demo });
 });
 
 // Batches
@@ -1305,6 +1337,67 @@ function syncCredentialsFile() {
   } catch (err) {
     console.error(`[Credentials] Sync error:`, err);
   }
+}
+
+function createStudentAndParentCredentials(student: any) {
+  const suffix = student.rollNo.slice(-2);
+  const studentUsername = `student${suffix}`;
+  const studentPassword = `stdpass${suffix}`;
+  const parentUsername = `parent_${suffix}`;
+  const parentPassword = `prnpass${suffix}`;
+
+  const studentCredential = {
+    id: `c_std_${student.id}`,
+    role: 'student',
+    studentId: student.id,
+    rollNo: student.rollNo,
+    name: student.name,
+    class: student.class,
+    board: student.board,
+    username: studentUsername,
+    password: studentPassword,
+    lastUpdated: new Date().toISOString().split('T')[0]
+  };
+
+  const parentCredential = {
+    id: `c_prn_p${student.rollNo}`,
+    role: 'parent',
+    parentId: `p${student.rollNo}`,
+    studentId: student.id,
+    studentName: student.name,
+    name: student.parentName || `Parent ${student.name}`,
+    username: parentUsername,
+    password: parentPassword,
+    lastUpdated: new Date().toISOString().split('T')[0]
+  };
+
+  db.credentials.push(studentCredential, parentCredential);
+  syncCredentialsFile();
+  return { studentCredential, parentCredential };
+}
+
+function convertAdmissionToStudent(admission: any) {
+  const newStudent = {
+    id: `s${Date.now().toString().slice(-4)}`,
+    rollNo: (1000 + db.students.length + 1).toString(),
+    status: 'active',
+    joinDate: new Date().toISOString().split('T')[0],
+    name: admission.studentName,
+    class: admission.class,
+    board: admission.board,
+    batchId: `b_${admission.board.toLowerCase().replace(/\s+/g, '_')}_${admission.class.replace(/\s+/g, '').toLowerCase()}`,
+    batchName: `${admission.class} ${admission.board} - Admission Batch`,
+    email: admission.email,
+    phone: admission.phone,
+    parentName: admission.parentName,
+    parentEmail: admission.parentEmail || admission.email,
+    parentPhone: admission.phone,
+    address: admission.address,
+  };
+
+  db.students.push(newStudent);
+  createStudentAndParentCredentials(newStudent);
+  return newStudent;
 }
 
 // Auth & Credentials API Endpoints

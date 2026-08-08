@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
+import { onlyNumbers, isValidIndianPhone } from '../../lib/validation';
 import { GraduationCap, CheckCircle2 } from 'lucide-react';
 
 interface OnlineAdmissionModalProps {
@@ -28,8 +29,8 @@ export const OnlineAdmissionModal: React.FC<OnlineAdmissionModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const isValidPhone = (value: string) => {
-    const digits = value.replace(/\D/g, '');
-    return digits.length === 10 || digits.length === 12;
+    const digits = onlyNumbers(value, 10);
+    return isValidIndianPhone(digits);
   };
 
   const isValidEmail = (value: string) => value.includes('@') && value.includes('.');
@@ -110,10 +111,13 @@ export const OnlineAdmissionModal: React.FC<OnlineAdmissionModalProps> = ({
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Contact Mobile Number *</label>
               <input
                 type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={10}
                 required
-                placeholder="+91 91234 56789"
+                placeholder="9876543210"
                 value={formData.phone}
-                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                onChange={e => setFormData({ ...formData, phone: onlyNumbers(e.target.value) })}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>

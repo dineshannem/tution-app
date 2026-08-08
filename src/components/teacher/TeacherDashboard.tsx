@@ -11,9 +11,12 @@ import {
   Plus,
   ArrowUpRight,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  Phone
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { PageTransition } from '../PageTransition';
 
 interface TeacherDashboardProps {
   setActiveTab: (tab: string) => void;
@@ -73,9 +76,10 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setActiveTab
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-indigo-950/80 via-slate-900/90 to-purple-950/80 p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden border border-white/10 backdrop-blur-xl">
+    <PageTransition>
+      <div className="space-y-8">
+        {/* Welcome Banner */}
+        <div className="bg-gradient-to-r from-indigo-950/80 via-slate-900/90 to-purple-950/80 p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden border border-white/10 backdrop-blur-xl">
         <div className="relative z-10 space-y-2">
           <div className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full w-fit">
             Owner & Head Teacher Portal
@@ -246,5 +250,6 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setActiveTab
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };

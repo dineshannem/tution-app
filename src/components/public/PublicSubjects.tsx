@@ -4,41 +4,6 @@ import { BookOpen, Sparkles, CheckCircle2, Calculator, Atom, FlaskConical, Dna, 
 import { PageTransition } from '../PageTransition'; // adjust path
 import { staggerContainer, listItem } from '../../lib/animations'; // adjust path
 
-//  Do NOT copy PublicHomeProps here
-
-const AboutPage = () => {   // or CoursesPage, FacultyPage, etc.
-  return (
-    <PageTransition>
-      <div className="space-y-10 p-6">
-
-        {/* Title Animation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl font-extrabold">About SSR Sir</h1>
-        </motion.div>
-
-        {/* Cards / Grid Animation */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
-          {/* Your existing cards here */}
-          <motion.div variants={listItem} whileHover={{ y: -6 }}>
-            {/* card content */}
-          </motion.div>
-        </motion.div>
-
-      </div>
-    </PageTransition>
-  );
-};
-
-export default AboutPage;
 
 interface PublicSubjectsProps {
   openFreeDemo: () => void;
@@ -190,14 +155,15 @@ export const PublicSubjects: React.FC<PublicSubjectsProps> = ({ openFreeDemo, op
   const classFilters = ['All', 'Class 10 Board', 'Class 9', 'Class 8', 'Classes 6 - 7', 'Classes 1 - 5'];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
-      {/* Page Title Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-3 max-w-3xl mx-auto"
-      >
-        <span className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/60 px-3.5 py-1 rounded-full border border-amber-200 dark:border-amber-800/60 inline-flex items-center gap-1.5 shadow-sm">
+    <PageTransition>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="text-center space-y-3 max-w-3xl mx-auto"
+        >
+          <span className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/60 px-3.5 py-1 rounded-full border border-amber-200 dark:border-amber-800/60 inline-flex items-center gap-1.5 shadow-sm">
           <BookOpen className="w-3.5 h-3.5" /> Core Curriculum & Academic Subjects
         </span>
         <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -206,37 +172,50 @@ export const PublicSubjects: React.FC<PublicSubjectsProps> = ({ openFreeDemo, op
         <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
           Comprehensive subject coaching for Classes 1 through 10 (CBSE, ICSE & State Boards). Single-teacher excellence by <span className="font-bold text-slate-900 dark:text-white">Samba Siva Reddy Annem (SSR Sir)</span> with bilingual Telugu & English explanation.
         </p>
-
+    </motion.div>
         {/* Filter Pills */}
-        <div className="pt-3 flex flex-wrap justify-center gap-2">
-          {classFilters.map(cf => (
-            <button
-              key={cf}
-              onClick={() => setSelectedClass(cf)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
-                selectedClass === cf
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              {cf}
-            </button>
-          ))}
-        </div>
-      </motion.div>
+<motion.div
+  variants={staggerContainer}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+  className="pt-3 flex flex-wrap justify-center gap-2"
+>
+  {classFilters.map(cf => (
+    <motion.button
+      key={cf}
+      variants={listItem}
+      whileHover={{ y: -20, scale: 1.16 }}
+      whileTap={{ scale: 0.96 }}
+      onClick={() => setSelectedClass(cf)}
+      className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
+        selectedClass === cf
+          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+      }`}
+    >
+      {cf}
+    </motion.button>
+  ))}
+</motion.div>
 
       {/* Grid of Subjects */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+     <motion.div
+  variants={staggerContainer}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+  className="grid grid-cols-1 md:grid-cols-2 gap-8"
+>
         {subjectsList.map((subject, idx) => {
           const IconComponent = subject.icon;
           return (
             <motion.div
-              key={subject.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all space-y-6 flex flex-col justify-between"
-            >
+  key={subject.id}
+  variants={listItem}
+  whileHover={{ y: -30 }}
+  className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all space-y-6 flex flex-col justify-between"
+>
               <div className="space-y-4">
                 {/* Header Row */}
                 <div className="flex items-start justify-between gap-4">
@@ -287,23 +266,28 @@ export const PublicSubjects: React.FC<PublicSubjectsProps> = ({ openFreeDemo, op
 
               {/* Action Buttons */}
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                <button
-                  onClick={openFreeDemo}
-                  className="flex-1 py-2.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs shadow transition-all text-center"
-                >
-                  Book Demo Class
-                </button>
-                <button
-                  onClick={openAdmission}
-                  className="flex-1 py-2.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow transition-all text-center"
-                >
-                  Apply Admission
-                </button>
-              </div>
+  <motion.button
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.97 }}
+    onClick={openFreeDemo}
+    className="flex-1 py-2.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs shadow"
+  >
+    Book Demo Class
+  </motion.button>
+  <motion.button
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.97 }}
+    onClick={openAdmission}
+    className="flex-1 py-2.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow"
+  >
+    Apply Admission
+  </motion.button>
+</div>
             </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
+  </PageTransition>
   );
 };

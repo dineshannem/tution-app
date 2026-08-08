@@ -4,42 +4,6 @@ import { motion } from 'motion/react';
 import { PageTransition } from '../PageTransition'; // adjust path
 import { staggerContainer, listItem } from '../../lib/animations'; // adjust path
 
-//  Do NOT copy PublicHomeProps here
-
-const AboutPage = () => {   // or CoursesPage, FacultyPage, etc.
-  return (
-    <PageTransition>
-      <div className="space-y-10 p-6">
-
-        {/* Title Animation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl font-extrabold">About SSR Sir</h1>
-        </motion.div>
-
-        {/* Cards / Grid Animation */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
-          {/* Your existing cards here */}
-          <motion.div variants={listItem} whileHover={{ y: -6 }}>
-            {/* card content */}
-          </motion.div>
-        </motion.div>
-
-      </div>
-    </PageTransition>
-  );
-};
-
-export default AboutPage;
-
 interface PublicAboutProps {
   openFreeDemo: () => void;
   openAdmission: () => void;
@@ -47,8 +11,15 @@ interface PublicAboutProps {
 
 export const PublicAbout: React.FC<PublicAboutProps> = ({ openFreeDemo, openAdmission }) => {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
-      {/* Bio Header */}
+    <PageTransition>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Bio Header */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div className="lg:col-span-5 relative">
           <div className="rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 h-96">
@@ -80,17 +51,24 @@ export const PublicAbout: React.FC<PublicAboutProps> = ({ openFreeDemo, openAdmi
           </p>
 
           <div className="grid grid-cols-2 gap-4 pt-2">
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-              <div className="text-2xl font-black text-amber-500">1,500+</div>
-              <div className="text-xs text-slate-500">Students Guided</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-              <div className="text-2xl font-black text-blue-500">98.4%</div>
-              <div className="text-xs text-slate-500">Board Distinction Score</div>
-            </div>
-          </div>
+  <motion.div
+    whileHover={{ y: -20 }}
+    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
+  >
+    <div className="text-2xl font-black text-amber-500">1,500+</div>
+    <div className="text-xs text-slate-500">Students Guided</div>
+  </motion.div>
+  <motion.div
+    whileHover={{ y: -20 }}
+    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
+  >
+    <div className="text-2xl font-black text-blue-500">98.4%</div>
+    <div className="text-xs text-slate-500">Board Distinction Score</div>
+  </motion.div>
+</div>
         </div>
       </div>
+        </motion.div>
 
       {/* Core Principles */}
       <div className="space-y-8 bg-white dark:bg-slate-900 text-slate-900 dark:text-white p-8 sm:p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl">
@@ -99,32 +77,35 @@ export const PublicAbout: React.FC<PublicAboutProps> = ({ openFreeDemo, openAdmi
           <p className="text-xs text-slate-600 dark:text-slate-400">Our core commitments to parents and students in Hyderabad.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-50 dark:bg-slate-800/70 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-            <Users className="w-8 h-8 text-amber-600 dark:text-amber-400" />
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Small Batch Culture</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Strict limit of 15 students per batch ensuring every doubt is resolved live in class.
-            </p>
-          </div>
-
-          <div className="bg-slate-50 dark:bg-slate-800/70 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-            <BookOpen className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Bilingual Explanation</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Complex mathematical proofs and scientific laws explained clearly in Telugu and English.
-            </p>
-          </div>
-
-          <div className="bg-slate-50 dark:bg-slate-800/70 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-            <Award className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Continuous Parent Updates</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Weekly progress reports, attendance alerts, and transparent fee management.
-            </p>
-          </div>
-        </div>
+        <motion.div
+  variants={staggerContainer}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+  className="grid grid-cols-1 md:grid-cols-3 gap-6"
+>
+  {[
+    { icon: Users, title: 'Small Batch Culture', desc: 'Strict limit of 15 students per batch ensuring every doubt is resolved live in class.', color: 'amber' },
+    { icon: BookOpen, title: 'Bilingual Explanation', desc: 'Complex mathematical proofs and scientific laws explained clearly in Telugu and English.', color: 'blue' },
+    { icon: Award, title: 'Continuous Parent Updates', desc: 'Weekly progress reports, attendance alerts, and transparent fee management.', color: 'emerald' }
+  ].map((item, i) => {
+    const Icon = item.icon;
+    return (
+      <motion.div
+        key={i}
+        variants={listItem}
+        whileHover={{ y: -20 }}
+        className="bg-slate-50 dark:bg-slate-800/70 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3"
+      >
+        <Icon className={`w-8 h-8 text-${item.color}-600 dark:text-${item.color}-400`} />
+        <h3 className="text-base font-bold text-slate-900 dark:text-white">{item.title}</h3>
+        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{item.desc}</p>
+      </motion.div>
+    );
+  })}
+</motion.div>
       </div>
     </div>
+    </PageTransition>
   );
 };

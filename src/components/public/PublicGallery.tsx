@@ -2,44 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GalleryItem } from '../../types';
 import { Maximize2, X, Sparkles, Image as ImageIcon, Download } from 'lucide-react';
-import { PageTransition } from '../PageTransition'; // adjust path
-import { staggerContainer, listItem } from '../../lib/animations'; // adjust path
-
-//  Do NOT copy PublicHomeProps here
-
-const AboutPage = () => {   // or CoursesPage, FacultyPage, etc.
-  return (
-    <PageTransition>
-      <div className="space-y-10 p-6">
-
-        {/* Title Animation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl font-extrabold">About SSR Sir</h1>
-        </motion.div>
-
-        {/* Cards / Grid Animation */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
-          {/* Your existing cards here */}
-          <motion.div variants={listItem} whileHover={{ y: -6 }}>
-            {/* card content */}
-          </motion.div>
-        </motion.div>
-
-      </div>
-    </PageTransition>
-  );
-};
-
-export default AboutPage;
+import { PageTransition } from '../PageTransition';
+import { staggerContainer, listItem } from '../../lib/animations';
 
 export const PublicGallery: React.FC = () => {
   const [items, setItems] = useState<GalleryItem[]>([]);
@@ -62,12 +26,14 @@ export const PublicGallery: React.FC = () => {
   const filteredItems = filter === 'All' ? items : items.filter(i => i.category === filter);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-3 max-w-2xl mx-auto"
-      >
+    <PageTransition>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="text-center space-y-3 max-w-2xl mx-auto"
+        >
         <span className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/60 inline-flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5" /> Interactive Campus Tour
         </span>
@@ -193,5 +159,6 @@ export const PublicGallery: React.FC = () => {
         )}
       </AnimatePresence>
     </div>
+  </PageTransition>
   );
 };

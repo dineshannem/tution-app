@@ -4,46 +4,12 @@ import { motion } from 'motion/react';
 import { PageTransition } from '../PageTransition'; // adjust path
 import { staggerContainer, listItem } from '../../lib/animations'; // adjust path
 
-//  Do NOT copy PublicHomeProps here
-
-const AboutPage = () => {   // or CoursesPage, FacultyPage, etc.
-  return (
-    <PageTransition>
-      <div className="space-y-10 p-6">
-
-        {/* Title Animation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl font-extrabold">About SSR Sir</h1>
-        </motion.div>
-
-        {/* Cards / Grid Animation */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-        >
-          {/* Your existing cards here */}
-          <motion.div variants={listItem} whileHover={{ y: -6 }}>
-            {/* card content */}
-          </motion.div>
-        </motion.div>
-
-      </div>
-    </PageTransition>
-  );
-};
-
-export default AboutPage;
 
 interface PublicCoursesProps {
   openFreeDemo: () => void;
   openAdmission: () => void;
 }
+
 
 export const PublicCourses: React.FC<PublicCoursesProps> = ({ openFreeDemo, openAdmission }) => {
   const courses = [
@@ -90,8 +56,14 @@ export const PublicCourses: React.FC<PublicCoursesProps> = ({ openFreeDemo, open
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-      <div className="text-center space-y-3 max-w-2xl mx-auto">
+    <PageTransition>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="text-center space-y-3 max-w-2xl mx-auto"
+        >
         <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest bg-amber-50 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/60">
           Academic Offerings
         </span>
@@ -101,26 +73,44 @@ export const PublicCourses: React.FC<PublicCoursesProps> = ({ openFreeDemo, open
         </p>
 
         {/* All 10 Boards Showcase Pill Grid */}
-        <div className="pt-2 flex flex-wrap justify-center gap-2">
+        <motion.div
+  variants={staggerContainer}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+  className="pt-2 flex flex-wrap justify-center gap-2"
+>
           {[
             'CBSE', 'ICSE', 'TG State Board (SSC)', 'AP State Board (SSC)',
             'Karnataka SSLC', 'Maharashtra SSC', 'Tamil Nadu Board',
             'IGCSE / Cambridge', 'IB World', 'NIOS'
-          ].map(board => (
-            <span key={board} className="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold text-xs rounded-xl border border-indigo-200 dark:border-indigo-800/60 shadow-sm">
-              ✓ {board}
-            </span>
+          ].map((board) => (
+            <motion.span
+      key={board}
+      variants={listItem}
+      whileHover={{ scale: 1.08, y: -2 }}
+      className="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-bold text-xs rounded-xl border border-indigo-200 dark:border-indigo-800/60 shadow-sm cursor-default"
+    >✓ {board}
+    </motion.span>
           ))}
-        </div>
+        </motion.div>
 
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <motion.div
+  variants={staggerContainer}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+>
         {courses.map((c, idx) => (
-          <div
-            key={idx}
-            className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm hover:shadow-xl transition-all space-y-5 flex flex-col justify-between"
-          >
+          <motion.div
+  key={idx}
+  variants={listItem}
+  whileHover={{ y: -20, scale: 1.02 }}
+  className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm hover:shadow-xl transition-all space-y-5 flex flex-col justify-between"
+>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-400 rounded-lg">
@@ -153,22 +143,28 @@ export const PublicCourses: React.FC<PublicCoursesProps> = ({ openFreeDemo, open
             </div>
 
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
-              <button
-                onClick={openFreeDemo}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition-colors"
-              >
-                Free Demo
-              </button>
-              <button
-                onClick={openAdmission}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors"
-              >
-                Apply Admission
-              </button>
-            </div>
-          </div>
+  <motion.button
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.97 }}
+    onClick={openFreeDemo}
+    className="flex-1 py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs"
+  >
+    Free Demo
+  </motion.button>
+
+  <motion.button
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.97 }}
+    onClick={openAdmission}
+    className="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
+  >
+    Apply Admission
+  </motion.button>
+</div>
+          </motion.div>
         ))}
+      </motion.div>
       </div>
-    </div>
+    </PageTransition>
   );
 };

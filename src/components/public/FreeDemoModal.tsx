@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
+import { onlyNumbers, isValidIndianPhone } from '../../lib/validation';
 import { Sparkles, CheckCircle2 } from 'lucide-react';
 
 interface FreeDemoModalProps {
@@ -23,8 +24,8 @@ export const FreeDemoModal: React.FC<FreeDemoModalProps> = ({ isOpen, onClose, o
   const [error, setError] = useState<string | null>(null);
 
   const isValidPhone = (value: string) => {
-    const digits = value.replace(/\D/g, '');
-    return digits.length === 10 || digits.length === 12;
+    const digits = onlyNumbers(value, 10);
+    return isValidIndianPhone(digits);
   };
 
   const isValidEmail = (value: string) => value.includes('@') && value.includes('.');
@@ -106,10 +107,13 @@ export const FreeDemoModal: React.FC<FreeDemoModalProps> = ({ isOpen, onClose, o
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Mobile / WhatsApp No. *</label>
               <input
                 type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={10}
                 required
-                placeholder="+91 98765 43210"
+                placeholder="9876543210"
                 value={formData.phone}
-                onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                onChange={e => setFormData({ ...formData, phone: onlyNumbers(e.target.value) })}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-amber-500 outline-none"
               />
             </div>

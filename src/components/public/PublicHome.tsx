@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageTransition } from '../PageTransition';
-import { staggerContainer, listItem } from '../../lib/animations.ts';
-
+import { staggerContainer, listItem } from '../../lib/animations';
+import { PublicHeader } from './PublicHeader';
+import { PublicFooter } from './PublicFooter';
+import { onlyNumbers, isValidIndianPhone } from '../../lib/validation';
+<PublicHeader
+  title="Courses & Batches (Classes 1–10)"
+  subtitle="Comprehensive curriculum with bilingual Telugu & English explanation."
+  badge="Academic Offerings"
+/>
 import {
   GraduationCap,
   Sparkles,
@@ -19,6 +26,7 @@ import {
   Send,
   HelpCircle
 } from 'lucide-react';
+
 
 interface PublicHomeProps {
   setActiveTab: (tab: string) => void;
@@ -45,10 +53,9 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
   const [phoneError, setPhoneError] = useState('');
 
   const handlePhoneChange = (value: string) => {
-    const onlyNumbers = value.replace(/\D/g, '').slice(0, 10);
-    setContactForm({ ...contactForm, phone: onlyNumbers });
-
-    if (onlyNumbers.length > 0 && onlyNumbers.length < 10) {
+    const digits = onlyNumbers(value, 10);
+    setContactForm({ ...contactForm, phone: digits });
+    if (digits.length > 0 && digits.length < 10) {
       setPhoneError('Phone number must be exactly 10 digits');
     } else {
       setPhoneError('');
@@ -57,12 +64,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (contactForm.phone.length !== 10) {
+    if (!isValidIndianPhone(contactForm.phone)) {
       setPhoneError('Phone number must be exactly 10 digits');
       return;
     }
-
     setSubmittingContact(true);
     try {
       await fetch('/api/contact', {
@@ -81,13 +86,13 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
   };
 
   const subjectsList = [
-    { name: 'Mathematics', desc: 'Step-by-step problem solving, shortcut formulas, board exam preparation.', icon: '📐' },
-    { name: 'Science', desc: 'Physics numericals, Chemistry balancing equations & Biology diagrams.', icon: '🔬' },
-    { name: 'Social Science', desc: 'History timelines, Geography maps, Civics & Economics breakdown.', icon: '🌍' },
-    { name: 'English', desc: 'Grammar mastery, unseen passage techniques, literature & essay writing.', icon: '📚' },
-    { name: 'Hindi', desc: 'Vyakaran, Patra Lekhan, comprehension and literature care.', icon: '✍️' },
-    { name: 'Telugu', desc: 'Telugu Vyakanam, Sandhulu, Samasalu & Board preparation.', icon: '🪶' },
-    { name: 'Computer Science', desc: 'Basic programming concepts, MS Office, logic building.', icon: '💻' }
+    { name: 'Mathematics', desc: 'Step-by-step problem solving, shortcut formulas, board exam preparation.', icon: '📐', hover: 'hover:border-blue-400/60' },
+    { name: 'Science', desc: 'Physics numericals, Chemistry balancing equations & Biology diagrams.', icon: '🔬', hover: 'hover:border-emerald-400/60' },
+    { name: 'Social Science', desc: 'History timelines, Geography maps, Civics & Economics breakdown.', icon: '🌍', hover: 'hover:border-amber-400/60' },
+    { name: 'English', desc: 'Grammar mastery, unseen passage techniques, literature & essay writing.', icon: '📚', hover: 'hover:border-purple-400/60' },
+    { name: 'Hindi', desc: 'Vyakaran, Patra Lekhan, comprehension and literature care.', icon: '✍️', hover: 'hover:border-rose-400/60' },
+    { name: 'Telugu', desc: 'Telugu Vyakanam, Sandhulu, Samasalu & Board preparation.', icon: '🪶', hover: 'hover:border-orange-400/60' },
+    { name: 'Computer Science', desc: 'Basic programming concepts, MS Office, logic building.', icon: '💻', hover: 'hover:border-cyan-400/60' }
   ];
 
   const faqs = [
@@ -113,7 +118,6 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
     }
   ];
 
-  // Common input class (works perfectly in Light & Dark mode)
   const inputClass =
     "w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-white/15 " +
     "bg-white dark:bg-slate-800/80 " +
@@ -125,7 +129,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
     <PageTransition>
       <div className="space-y-20 pb-16">
 
-        {/* 1. Hero Banner Section */}
+        {/* 1. Hero */}
         <section className="relative overflow-hidden bg-slate-950/70 text-white pt-12 pb-20 rounded-3xl mx-4 sm:mx-6 lg:mx-8 mt-4 shadow-2xl border border-white/10 backdrop-blur-2xl">
           <div className="absolute inset-0 bg-gradient-to-tr from-indigo-950/80 via-slate-900/90 to-purple-950/80 opacity-90" />
           <div className="absolute -top-32 -right-32 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -133,14 +137,19 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
+              initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-7 space-y-6 text-center lg:text-left"
             >
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide shadow-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide shadow-sm"
+              >
                 <Sparkles className="w-4 h-4 text-amber-400" /> ADMISSIONS OPEN FOR ACADEMIC YEAR 2026-27
-              </div>
+              </motion.div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
                 Empowering Students for Board Excellence in{' '}
@@ -156,8 +165,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
                 <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: 1.06, y: -15 }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={openFreeDemo}
                   className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/25 flex items-center gap-2"
                 >
@@ -165,8 +174,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: 1.06, y: -15 }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={openAdmission}
                   className="px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 border border-indigo-400/30 flex items-center gap-2"
                 >
@@ -175,29 +184,34 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
               </div>
 
               <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/10 text-center lg:text-left">
-                <div>
-                  <div className="text-2xl font-black text-amber-300">15+ Yrs</div>
-                  <div className="text-xs text-slate-400">Teaching Experience</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-indigo-300">Max 15</div>
-                  <div className="text-xs text-slate-400">Students Per Batch</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-black text-emerald-400">98%</div>
-                  <div className="text-xs text-slate-400">Board Pass Rate</div>
-                </div>
+                {[
+                  { value: '15+ Yrs', label: 'Teaching Experience', color: 'text-amber-300' },
+                  { value: 'Max 15', label: 'Students Per Batch', color: 'text-indigo-300' },
+                  { value: '98%', label: 'Board Pass Rate', color: 'text-emerald-400' }
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 + i * 0.1 }}
+                  >
+                    <div className={`text-2xl font-black ${stat.color}`}>{stat.value}</div>
+                    <div className="text-xs text-slate-400">{stat.label}</div>
+                  </motion.div>
+                ))}
               </div>
             </motion.div>
 
-            {/* Hero Visual Card */}
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
+              transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-5 flex justify-center"
             >
-              <div className="relative w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-6 shadow-2xl space-y-4">
+              <motion.div
+                whileHover={{ y: -20, scale: 1.02 }}
+                className="relative w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-6 shadow-2xl space-y-4"
+              >
                 <div className="relative rounded-2xl overflow-hidden h-52">
                   <img
                     src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&auto=format&fit=crop&q=80"
@@ -209,7 +223,6 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     Owner-Teacher SSR Sir (Samba Siva Reddy Annem)
                   </span>
                 </div>
-
                 <div className="space-y-2 text-xs text-slate-300">
                   {[
                     'Classes 1–10 (CBSE & State Board)',
@@ -217,18 +230,24 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     'Weekly Tests & Instant Parent WhatsApp Updates',
                     'Online Google Meet + Offline Classroom Batches'
                   ].map((text, i) => (
-                    <div key={i} className="flex items-center gap-2">
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.8 + i * 0.08 }}
+                      className="flex items-center gap-2"
+                    >
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                       <span>{text}</span>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </section>
 
-        {/* 2. Why Choose SSR Tuition */}
+        {/* 2. Why Choose */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -255,36 +274,16 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {[
-              {
-                icon: <Users className="w-6 h-6" />,
-                color: 'amber',
-                title: 'Small Batches (Max 15)',
-                desc: 'No overcrowded hall of 100 students. Small batch size guarantees personal attention from SSR Sir for every single student.'
-              },
-              {
-                icon: <BookOpen className="w-6 h-6" />,
-                color: 'indigo',
-                title: 'Telugu & English Medium',
-                desc: 'Concepts explained step-by-step in clear Telugu and English so students grasp fundamental logic without hesitation.'
-              },
-              {
-                icon: <FileText className="w-6 h-6" />,
-                color: 'purple',
-                title: 'Daily Homework & Weekly Tests',
-                desc: 'Daily practice problems evaluated with teacher remarks. Rigorous weekly tests simulate real exam conditions.'
-              },
-              {
-                icon: <MessageSquare className="w-6 h-6" />,
-                color: 'emerald',
-                title: 'Parent Progress Updates',
-                desc: 'Parents get direct access to child attendance, weekly marks, and instant teacher messages via the Parent Portal.'
-              }
+              { icon: <Users className="w-6 h-6" />, color: 'amber', border: 'hover:border-amber-400/50', title: 'Small Batches (Max 15)', desc: 'No overcrowded hall of 100 students. Small batch size guarantees personal attention from SSR Sir for every single student.' },
+              { icon: <BookOpen className="w-6 h-6" />, color: 'indigo', border: 'hover:border-indigo-400/50', title: 'Telugu & English Medium', desc: 'Concepts explained step-by-step in clear Telugu and English so students grasp fundamental logic without hesitation.' },
+              { icon: <FileText className="w-6 h-6" />, color: 'purple', border: 'hover:border-purple-400/50', title: 'Daily Homework & Weekly Tests', desc: 'Daily practice problems evaluated with teacher remarks. Rigorous weekly tests simulate real exam conditions.' },
+              { icon: <MessageSquare className="w-6 h-6" />, color: 'emerald', border: 'hover:border-emerald-400/50', title: 'Parent Progress Updates', desc: 'Parents get direct access to child attendance, weekly marks, and instant teacher messages via the Parent Portal.' }
             ].map((item, i) => (
               <motion.div
                 key={i}
                 variants={listItem}
-                whileHover={{ y: -8 }}
-                className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl hover:border-indigo-500/40 transition-all space-y-3"
+                whileHover={{ y: -30, scale: 1.02 }}
+                className={`bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl ${item.border} transition-all space-y-3 cursor-default`}
               >
                 <div className={`w-12 h-12 rounded-xl bg-${item.color}-500/20 text-${item.color}-600 dark:text-${item.color}-300 border border-${item.color}-500/30 flex items-center justify-center`}>
                   {item.icon}
@@ -296,7 +295,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
           </motion.div>
         </section>
 
-        {/* 3. Subjects Taught */}
+        {/* 3. Subjects */}
         <section className="bg-slate-100/80 dark:bg-slate-950/40 py-16 border-y border-slate-200 dark:border-white/10 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
             <motion.div
@@ -322,8 +321,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                 <motion.div
                   key={i}
                   variants={listItem}
-                  whileHover={{ y: -6 }}
-                  className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl hover:border-indigo-400/50 transition-all flex items-start gap-4"
+                  whileHover={{ y: -20, scale: 1.02 }}
+                  className={`bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl ${sub.hover} transition-all flex items-start gap-4 cursor-default`}
                 >
                   <div className="text-3xl p-3 bg-slate-100 dark:bg-white/10 rounded-2xl flex-shrink-0 border border-slate-200 dark:border-white/10">
                     {sub.icon}
@@ -338,12 +337,13 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
           </div>
         </section>
 
-        {/* 4. Teaching Methodology & Special Care */}
+        {/* 4. Teaching Methodology */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: -500 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
             className="space-y-6"
           >
             <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
@@ -358,21 +358,17 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
 
             <div className="space-y-3">
               {[
-                {
-                  title: 'Zero-Fear Classroom Culture',
-                  desc: 'Students are encouraged to ask doubt questions freely without feeling self-conscious.'
-                },
-                {
-                  title: 'Offline & Online Google Meet Flexibility',
-                  desc: 'Attend in-person at our Hyderabad tuition center or join live Google Meet classes remotely.'
-                },
-                {
-                  title: 'Curated PDF Notes & Formulas',
-                  desc: 'Handcrafted formula sheets, ray diagram guides, and previous 10-year board paper solutions.'
-                }
+                { title: 'Zero-Fear Classroom Culture', desc: 'Students are encouraged to ask doubt questions freely without feeling self-conscious.' },
+                { title: 'Offline & Online Google Meet Flexibility', desc: 'Attend in-person at our Hyderabad tuition center or join live Google Meet classes remotely.' },
+                { title: 'Curated PDF Notes & Formulas', desc: 'Handcrafted formula sheets, ray diagram guides, and previous 10-year board paper solutions.' }
               ].map((item, i) => (
-                <div
+                <motion.div
                   key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ x: 6 }}
                   className="flex items-start gap-3 p-3.5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 backdrop-blur-xl shadow-md"
                 >
                   <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
@@ -380,15 +376,17 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white">{item.title}</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400">{item.desc}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: 500 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            whileHover={{ scale: 1.02 }}
             className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/15 h-96"
           >
             <img
@@ -427,30 +425,15 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
               className="grid grid-cols-1 md:grid-cols-3 gap-6"
             >
               {[
-                {
-                  text: `"SSR Sir's personal attention changed my daughter's score from 65% to 92% in Maths! The small batch size and daily homework checking really make a difference."`,
-                  name: 'Srinivas Reddy',
-                  role: 'Parent of Ananya (Class 10 State)',
-                  img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150'
-                },
-                {
-                  text: `"SSR Sir explains complex Physics numerics and Maths formulas in very simple Telugu and English. Weekly tests prepared me completely for the board exam!"`,
-                  name: 'Rahul Sharma',
-                  role: 'Student (Class 10 CBSE - 94% Scored)',
-                  img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150'
-                },
-                {
-                  text: `"Parent updates on WhatsApp and online portal keep us informed every week. Best tuition in Hyderabad for CBSE and State Board!"`,
-                  name: 'Lakshmi Devi',
-                  role: 'Parent of Sai Karthik (Class 9 CBSE)',
-                  img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150'
-                }
+                { text: `"SSR Sir's personal attention changed my daughter's score from 65% to 92% in Maths! The small batch size and daily homework checking really make a difference."`, name: 'Srinivas Reddy', role: 'Parent of Ananya (Class 10 State)', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', border: 'hover:border-amber-400/50' },
+                { text: `"SSR Sir explains complex Physics numerics and Maths formulas in very simple Telugu and English. Weekly tests prepared me completely for the board exam!"`, name: 'Rahul Sharma', role: 'Student (Class 10 CBSE - 94% Scored)', img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150', border: 'hover:border-indigo-400/50' },
+                { text: `"Parent updates on WhatsApp and online portal keep us informed every week. Best tuition in Hyderabad for CBSE and State Board!"`, name: 'Lakshmi Devi', role: 'Parent of Sai Karthik (Class 9 CBSE)', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', border: 'hover:border-emerald-400/50' }
               ].map((item, i) => (
                 <motion.div
                   key={i}
                   variants={listItem}
-                  whileHover={{ y: -8 }}
-                  className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 p-6 rounded-2xl space-y-4 backdrop-blur-xl shadow-xl"
+                  whileHover={{ y: -20, scale: 1.02 }}
+                  className={`bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 p-6 rounded-2xl space-y-4 backdrop-blur-xl shadow-xl ${item.border} transition-all cursor-default`}
                 >
                   <div className="flex items-center gap-1 text-amber-400">
                     {[...Array(5)].map((_, j) => (
@@ -503,7 +486,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     <HelpCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-300 flex-shrink-0" />
                     {faq.q}
                   </span>
-                  <motion.div animate={{ rotate: openFaq === idx ? 180 : 0 }}>
+                  <motion.div animate={{ rotate: openFaq === idx ? 180 : 0 }} transition={{ duration: 0.25 }}>
                     <ChevronDown className="w-5 h-5" />
                   </motion.div>
                 </button>
@@ -528,10 +511,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
           </div>
         </section>
 
-        {/* 7. Contact Form */}
+        {/* 7. Contact */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 300 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="lg:col-span-6 bg-white dark:bg-slate-900/80 backdrop-blur-2xl p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl space-y-6"
@@ -548,73 +531,36 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Your Name *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Full Name"
-                    value={contactForm.name}
-                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                    className={inputClass}
-                  />
+                  <input type="text" required placeholder="Full Name" value={contactForm.name} onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })} className={inputClass} />
                 </div>
-
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Mobile Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="9876543210"
-                    value={contactForm.phone}
-                    onChange={(e) => handlePhoneChange(e.target.value)}
-                    className={inputClass}
-                    maxLength={10}
-                  />
-                  {phoneError && (
-                    <p className="text-[11px] text-rose-500 mt-1 font-medium">{phoneError}</p>
-                  )}
+                  <input type="tel" required placeholder="9876543210" value={contactForm.phone} onChange={(e) => handlePhoneChange(e.target.value)} className={inputClass} maxLength={10} />
+                  {phoneError && <p className="text-[11px] text-rose-500 mt-1 font-medium">{phoneError}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Email Address</label>
-                  <input
-                    type="email"
-                    placeholder="name@gmail.com"
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                    className={inputClass}
-                  />
+                  <input type="email" placeholder="name@gmail.com" value={contactForm.email} onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })} className={inputClass} />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Subject</label>
-                  <input
-                    type="text"
-                    placeholder="Class 10 CBSE Batch Timings"
-                    value={contactForm.subject}
-                    onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
-                    className={inputClass}
-                  />
+                  <input type="text" placeholder="Class 10 CBSE Batch Timings" value={contactForm.subject} onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })} className={inputClass} />
                 </div>
               </div>
 
               <div>
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Your Message *</label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="Ask any details regarding tuition timings, fee structure, or Telugu explanation care..."
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  className={inputClass}
-                />
+                <textarea rows={4} required placeholder="Ask any details regarding tuition timings, fee structure, or Telugu explanation care..." value={contactForm.message} onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })} className={inputClass} />
               </div>
 
               <motion.button
                 type="submit"
                 disabled={submittingContact}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 border border-indigo-400/30 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 <Send className="w-4 h-4" />
@@ -623,15 +569,17 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
             </form>
           </motion.div>
 
-          {/* Contact Info + Map */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 300 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
             className="lg:col-span-6 space-y-6"
           >
-            <div className="bg-white dark:bg-slate-900/80 backdrop-blur-2xl text-slate-900 dark:text-white p-8 rounded-3xl space-y-6 shadow-2xl border border-slate-200 dark:border-white/10">
+            <motion.div
+              whileHover={{ y: -10 }}
+              className="bg-white dark:bg-slate-900/80 backdrop-blur-2xl text-slate-900 dark:text-white p-8 rounded-3xl space-y-6 shadow-2xl border border-slate-200 dark:border-white/10"
+            >
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">Center Details & Working Hours</h3>
               <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300">
                 <div className="flex items-start gap-3">
@@ -641,7 +589,6 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     <span>H.No 4-12, Main Road, Near Bus Stop, Hyderabad, Telangana 500038</span>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                   <div>
@@ -649,7 +596,6 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     <span>+91 98765 43210 / +91 91234 56789</span>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-indigo-600 dark:text-indigo-300 flex-shrink-0" />
                   <div>
@@ -658,15 +604,15 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-xl h-64 bg-slate-100 dark:bg-slate-900 relative flex items-center justify-center p-6 text-center">
+            <motion.div
+              whileHover={{ y: -10 }}
+              className="rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-xl h-64 bg-slate-100 dark:bg-slate-900 relative flex items-center justify-center p-6 text-center"
+            >
               <div
                 className="absolute inset-0 bg-cover bg-center opacity-30"
-                style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&auto=format&fit=crop&q=80')"
-                }}
+                style={{ backgroundImage: "url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&auto=format&fit=crop&q=80')" }}
               />
               <div className="relative z-10 space-y-3 bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/15 shadow-2xl">
                 <MapPin className="w-8 h-8 text-rose-500 mx-auto animate-bounce" />
@@ -681,10 +627,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                   Open Google Maps Navigation
                 </a>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </section>
-      </div>
+  </div>
     </PageTransition>
   );
 };

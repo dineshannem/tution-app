@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Student } from '../../types';
+import { motion } from 'motion/react';
 import { Search, UserPlus, Edit3, Eye, Trash2, CheckCircle2, XCircle } from 'lucide-react';
 import { Modal } from '../common/Modal';
+import { onlyNumbers } from '../../lib/validation';
+import { PageTransition } from '../PageTransition';
 
 interface StudentManagementProps {
   onSuccessToast: (msg: string) => void;
@@ -100,8 +103,9 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ onSuccessT
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <PageTransition>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Student Directory</h1>
           <p className="text-xs text-slate-500">Manage all students across Classes 1 to 10 and CBSE/State Boards.</p>
@@ -292,10 +296,13 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ onSuccessT
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Parent Mobile No. *</label>
               <input
                 type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={10}
                 required
-                placeholder="+91 98765 43210"
+                placeholder="9876543210"
                 value={formData.parentPhone}
-                onChange={e => setFormData({ ...formData, parentPhone: e.target.value })}
+                onChange={e => setFormData({ ...formData, parentPhone: onlyNumbers(e.target.value) })}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none"
               />
             </div>
@@ -344,5 +351,6 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ onSuccessT
         </Modal>
       )}
     </div>
+  </PageTransition>
   );
 };

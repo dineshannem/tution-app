@@ -700,40 +700,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* TOP ANIMATED SCROLL INDICATOR BAR FOR MENU (Crucial for Teacher Mode & Multi-Tab Portals) */}
-      <div className="bg-slate-900 dark:bg-slate-950 border-t border-slate-800/80 px-2 sm:px-4 py-1.5 w-full max-w-full min-w-0 overflow-hidden">
-        
-        {/* Animated Banner Header for Teacher Mode / Long Menus */}
-        {role === 'teacher' && (
-          <div className="max-w-7xl mx-auto px-2 mb-1 flex items-center justify-between text-xs min-w-0">
-            <div className="flex items-center gap-2 min-w-0 truncate">
-              <span className="flex h-2 w-2 relative shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-              </span>
-              <span className="text-amber-400 font-extrabold uppercase tracking-wider text-[10px] shrink-0">
-                Teacher Portal (12 Modules)
-              </span>
-              <span className="hidden sm:inline text-slate-300 text-[11px] truncate">
-                — Scroll menu horizontally or tap arrow controls to view all tools
-              </span>
-            </div>
-
-            {/* Animated Scroll Arrow Cue (Mobile & Tablet View Only - Hidden on Laptop Screens) */}
-            <div className="lg:hidden flex items-center gap-1 text-amber-300 font-bold text-[10px] shrink-0">
-              <span className="hidden xs:inline">SCROLL MENU</span>
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 1, ease: 'easeInOut' }}
-                className="flex items-center text-amber-400 font-extrabold"
-              >
-                <ArrowRight className="w-3.5 h-3.5" />
-              </motion.div>
-            </div>
-          </div>
-        )}
-
-        {/* Scrollable Horizontal Navigation Container with Interactive Arrow Buttons */}
+      {role === 'guest' && (
+        <div className="bg-slate-900 dark:bg-slate-950 border-t border-slate-800/80 px-2 sm:px-4 py-1.5 w-full max-w-full min-w-0 overflow-hidden">
+          {/* Scrollable Horizontal Navigation Container with Interactive Arrow Buttons */}
         <div className="relative max-w-7xl mx-auto flex items-center min-w-0 w-full">
           
           {/* Scroll Left Button - Only in Mobile/Tablet View */}
@@ -802,6 +771,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           />
         </div>
       </div>
+      )}
 
       {/* MOBILE & TABLET DRAWER MENU (Cleanly Contains All Portals and All Menu Items) */}
       <AnimatePresence>

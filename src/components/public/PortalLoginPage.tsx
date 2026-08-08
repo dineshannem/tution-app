@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
+import { PageTransition } from '../PageTransition';
+import { staggerContainer, listItem } from '../../lib/animations';
 import {
   Shield,
   User,
@@ -143,10 +145,16 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
   const CurrentIcon = currentConfig.icon;
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-5xl mx-auto py-4">
-      
-      {/* Top Banner & Title */}
-      <div className="text-center space-y-3">
+    <PageTransition>
+      <div className="space-y-8 animate-fade-in max-w-5xl mx-auto py-4">
+        
+        {/* Top Banner & Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="text-center space-y-3"
+        >
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-extrabold text-xs tracking-wider uppercase shadow-sm">
           <KeyRound className="w-3.5 h-3.5" /> SSR Tuition Official Portal Gateway
         </div>
@@ -156,19 +164,25 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
         <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
           Dedicated login portals for Students, Parents, and Teacher. Supported across CBSE, ICSE, TG & AP State Boards, and 6 additional State & National curricula.
         </p>
-      </div>
+      </motion.div>
 
       {/* 3 Main Portal Selection Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+      >
         {(['student', 'parent', 'teacher'] as const).map(pRole => {
           const conf = portalConfig[pRole];
           const IconComp = conf.icon;
           const isSelected = role === pRole;
 
           return (
-            <button
+            <motion.button
               key={pRole}
               type="button"
+              variants={listItem}
               onClick={() => { setRole(pRole); setError(null); }}
               className={`p-5 rounded-3xl border-2 text-left transition-all relative flex flex-col justify-between space-y-4 ${
                 isSelected
@@ -202,10 +216,10 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
                   {conf.subtitle}
                 </p>
               </div>
-            </button>
+            </motion.button>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* Main Login Card Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
@@ -423,5 +437,6 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
       </div>
 
     </div>
+    </PageTransition>
   );
 };

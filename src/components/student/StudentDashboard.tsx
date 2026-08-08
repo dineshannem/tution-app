@@ -5,6 +5,7 @@ import { BookOpen, CheckCircle2, Video, FileText, Clock, Award, ArrowUpRight } f
 
 interface StudentDashboardProps {
   setActiveTab: (tab: string) => void;
+  onSuccessToast?: (msg: string) => void;
 }
 
 export const StudentDashboard: React.FC<StudentDashboardProps> = ({ setActiveTab }) => {

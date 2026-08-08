@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import { useAuth } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
-import { Footer } from './components/layout/Footer';
+import { PublicFooter } from './components/public/PublicFooter';
 import { Toast } from './components/common/Toast';
+import { Sidebar } from './components/Sidebar';
 import { FreeDemoModal } from './components/public/FreeDemoModal';
 import { OnlineAdmissionModal } from './components/public/OnlineAdmissionModal';
 
@@ -20,6 +21,9 @@ import { PortalLoginPage } from './components/public/PortalLoginPage';
 
 // Teacher panel components
 import { TeacherDashboard } from './components/teacher/TeacherDashboard';
+import { TeacherApprovals } from './components/teacher/TeacherApprovals';
+import { TeacherEnquiries } from './components/teacher/TeacherEnquiries';
+import { TeacherDemoDetails } from './components/teacher/TeacherDemoDetails';
 import { StudentManagement } from './components/teacher/StudentManagement';
 import { ParentManagement } from './components/teacher/ParentManagement';
 import { BatchManagement } from './components/teacher/BatchManagement';
@@ -50,11 +54,14 @@ import { ParentHomework } from './components/parent/ParentHomework';
 import { ParentSchedule } from './components/parent/ParentSchedule';
 
 export default function App() {
-  const { user } = useAuth();
+  const { user, role, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const [isAdmissionModalOpen, setIsAdmissionModalOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => window.innerWidth < 768);
+
+  const isPortalView = !!user && role !== 'guest';
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -66,6 +73,15 @@ export default function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeTab]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSidebarCollapsed(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -130,6 +146,12 @@ export default function App() {
         return <FeeManagement onSuccessToast={showToast} />;
       case 't_gallery':
         return <GalleryAdmin onSuccessToast={showToast} />;
+      case 't_approvals':
+        return <TeacherApprovals />;
+      case 't_enquiries':
+        return <TeacherEnquiries />;
+      case 't_demos':
+        return <TeacherDemoDetails />;
       case 't_dashboard':
       default:
         return <TeacherDashboard setActiveTab={setActiveTab} />;
@@ -208,6 +230,12 @@ export default function App() {
     return renderPublicContent();
   };
 
+  const contentPaddingClass = isPortalView
+    ? sidebarCollapsed
+      ? 'pl-20 md:pl-20 lg:pl-20'
+      : 'pl-[260px] md:pl-[260px] lg:pl-[260px]'
+    : '';
+
   return (
     <div className="min-h-screen flex flex-col text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-300">
       {/* Top Scroll Progress Bar */}
@@ -222,8 +250,9 @@ export default function App() {
       {/* Main Navbar */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} openFreeDemo={openFreeDemo} openAdmission={openAdmission} />
 
-      {/* Dynamic Main View with Spring Motion Page Transitions */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className={"flex-1 min-h-screen relative " + contentPaddingClass}>
+        {/* Dynamic Main View with Spring Motion Page Transitions */}
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -242,6 +271,7 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
       </main>
+      </div>
 
       {/* Global Modals */}
       <FreeDemoModal
@@ -257,7 +287,19 @@ export default function App() {
       />
 
       {/* Footer */}
-      <Footer setActiveTab={setActiveTab} openFreeDemo={openFreeDemo} openAdmission={openAdmission} />
+      <PublicFooter setActiveTab={setActiveTab} openFreeDemo={openFreeDemo} openAdmission={openAdmission} />
+      {isPortalView && (
+        <Sidebar
+          role={user?.role as 'teacher' | 'student' | 'parent'}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
+          userName={user?.name}
+          userAvatar={user?.avatar}
+          onLogout={logout}
+        />
+      )}
     </div>
   );
 }
