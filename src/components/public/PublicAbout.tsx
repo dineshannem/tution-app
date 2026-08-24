@@ -24,7 +24,7 @@ export const PublicAbout: React.FC<PublicAboutProps> = ({ openFreeDemo, openAdmi
         <div className="lg:col-span-5 relative">
           <div className="rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 h-96">
             <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80"
+              src="https://img.magnific.com/premium-photo/smiling-handsome-indian-male-teacher_928503-3479.jpg?semt=ais_hybrid&w=740&q=80"
               alt="SSR Sir"
               className="w-full h-full object-cover"
             />

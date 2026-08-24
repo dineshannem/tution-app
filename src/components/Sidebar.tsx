@@ -32,41 +32,94 @@ interface SidebarProps {
   onLogout: () => void;
 }
 
-const teacherMenu = [
-  { id: 't_dashboard', label: 'Dashboard', icon: GraduationCap },
-  { id: 't_approvals', label: 'Application Approvals', icon: CheckCircle2 },
-  { id: 't_enquiries', label: 'Public Enquiries', icon: MessageSquare },
-  { id: 't_demos', label: 'Demo Requests', icon: Sparkles },
-  { id: 't_students', label: 'Students', icon: Users },
-  { id: 't_parents', label: 'Parents', icon: Users },
-  { id: 't_credentials', label: 'Credentials & Reset', icon: KeyRound },
-  { id: 't_batches', label: 'Batches', icon: BookOpen },
-  { id: 't_attendance', label: 'Attendance', icon: UserCheck },
-  { id: 't_homework', label: 'Homework', icon: FileText },
-  { id: 't_materials', label: 'Materials', icon: BookOpen },
-  { id: 't_online_classes', label: 'Meet Classes', icon: Video },
-  { id: 't_tests', label: 'Tests & Marks', icon: Award },
-  { id: 't_fees', label: 'Fee Management', icon: CreditCard },
-  { id: 't_gallery', label: 'Gallery Admin', icon: Image },
+const teacherSections = [
+  {
+    label: 'Academics',
+    items: [
+      { id: 't_dashboard', label: 'Dashboard', icon: GraduationCap },
+      { id: 't_students', label: 'Students', icon: Users },
+      { id: 't_parents', label: 'Parents', icon: Users },
+      { id: 't_batches', label: 'Batches', icon: BookOpen },
+      { id: 't_attendance', label: 'Attendance', icon: UserCheck },
+      { id: 't_homework', label: 'Homework', icon: FileText },
+      { id: 't_materials', label: 'Materials', icon: BookOpen },
+      { id: 't_online_classes', label: 'Meet Classes', icon: Video },
+      { id: 't_tests', label: 'Tests & Marks', icon: Award },
+    ]
+  },
+  {
+    label: 'Management',
+    items: [
+      { id: 't_credentials', label: 'Credentials & Reset', icon: KeyRound },
+      { id: 't_approvals', label: 'Application Approvals', icon: CheckCircle2 },
+      { id: 't_enquiries', label: 'Public Enquiries', icon: MessageSquare },
+      { id: 't_demos', label: 'Demo Requests', icon: Sparkles },
+      { id: 't_gallery', label: 'Gallery Admin', icon: Image },
+    ]
+  },
+  {
+    label: 'Community',
+    items: [
+      { id: 'reviews', label: 'Reviews', icon: Award }
+    ]
+  },
+  {
+    label: 'Finance',
+    items: [
+      { id: 't_fees', label: 'Fee Management', icon: CreditCard }
+    ]
+  }
 ];
 
-const studentMenu = [
-  { id: 's_dashboard', label: 'Dashboard', icon: GraduationCap },
-  { id: 's_attendance', label: 'Attendance', icon: UserCheck },
-  { id: 's_homework', label: 'Homework', icon: FileText },
-  { id: 's_materials', label: 'Study Materials', icon: BookOpen },
-  { id: 's_classes', label: 'Live & Recorded', icon: Video },
-  { id: 's_results', label: 'Results', icon: Award },
-  { id: 's_fees', label: 'Pay Fees', icon: CreditCard },
+const studentSections = [
+  {
+    label: 'Academics',
+    items: [
+      { id: 's_dashboard', label: 'Dashboard', icon: GraduationCap },
+      { id: 's_attendance', label: 'Attendance', icon: UserCheck },
+      { id: 's_homework', label: 'Homework', icon: FileText },
+      { id: 's_materials', label: 'Study Materials', icon: BookOpen },
+      { id: 's_classes', label: 'Live & Recorded', icon: Video },
+      { id: 's_results', label: 'Results', icon: Award },
+    ]
+  },
+  {
+    label: 'Community',
+    items: [
+      { id: 'reviews', label: 'Reviews', icon: Award }
+    ]
+  },
+  {
+    label: 'Finance',
+    items: [
+      { id: 's_fees', label: 'Pay Fees', icon: CreditCard }
+    ]
+  }
 ];
 
-const parentMenu = [
-  { id: 'p_dashboard', label: 'Dashboard', icon: GraduationCap },
-  { id: 'p_attendance', label: 'Child Attendance', icon: UserCheck },
-  { id: 'p_homework', label: 'Homework Track', icon: FileText },
-  { id: 'p_results', label: 'Results & Progress', icon: Award },
-  { id: 'p_fees', label: 'Fee Details & Pay', icon: CreditCard },
-  { id: 'p_schedule', label: 'Class Schedule', icon: Calendar },
+const parentSections = [
+  {
+    label: 'Academics',
+    items: [
+      { id: 'p_dashboard', label: 'Dashboard', icon: GraduationCap },
+      { id: 'p_attendance', label: 'Child Attendance', icon: UserCheck },
+      { id: 'p_homework', label: 'Homework Track', icon: FileText },
+      { id: 'p_results', label: 'Results & Progress', icon: Award },
+      { id: 'p_schedule', label: 'Class Schedule', icon: Calendar },
+    ]
+  },
+  {
+    label: 'Community',
+    items: [
+      { id: 'reviews', label: 'Reviews', icon: Award }
+    ]
+  },
+  {
+    label: 'Finance',
+    items: [
+      { id: 'p_fees', label: 'Fee Details & Pay', icon: CreditCard }
+    ]
+  }
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -79,10 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   userAvatar,
   onLogout
 }) => {
-  const menuItems =
-    role === 'teacher' ? teacherMenu :
-    role === 'student' ? studentMenu :
-    parentMenu;
+  const sections = role === 'teacher' ? teacherSections : role === 'student' ? studentSections : parentSections;
 
   return (
     <motion.aside
@@ -103,27 +153,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-      {/* Menu */}
-      <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1 scrollbar-none">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                isActive
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25'
-                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-amber-300' : ''}`} />
-              {!collapsed && <span className="truncate">{item.label}</span>}
-            </button>
-          );
-        })}
+      {/* Menu - grouped sections */}
+      <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-3 scrollbar-none">
+        {sections.map((section) => (
+          <div key={section.label} className="space-y-2">
+            {!collapsed && (
+              <div className="px-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">{section.label}</div>
+            )}
+            <div className="space-y-1">
+              {section.items.map((item: any) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                      isActive
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}>
+                    <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-amber-300' : ''}`} />
+                    {!collapsed && <span className="truncate">{item.label}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* User + Logout */}

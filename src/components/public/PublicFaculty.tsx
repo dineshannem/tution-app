@@ -48,7 +48,7 @@ export const PublicFaculty: React.FC<PublicFacultyProps> = ({ openFreeDemo }) =>
             className="lg:col-span-5 relative"
           >
             <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80"
+              src="https://img.magnific.com/premium-photo/smiling-handsome-indian-male-teacher_928503-3479.jpg?semt=ais_hybrid&w=740&q=80"
               alt="SSR Sir"
               className="w-full h-96 object-cover rounded-2xl shadow-md"
             />

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { UserCheck, DollarSign, Award, BookOpen, MessageSquare, Phone, CheckCircle2 } from 'lucide-react';
+import { ReviewsEditor } from '../common/ReviewsEditor';
+import { getStoredTestimonials } from '../../lib/reviews';
 
 interface ParentDashboardProps {
   setActiveTab: (tab: string) => void;
@@ -11,6 +13,16 @@ interface ParentDashboardProps {
 export const ParentDashboard: React.FC<ParentDashboardProps> = ({ setActiveTab, openPayModal }) => {
   const { user } = useAuth();
   const [childResults, setChildResults] = useState<any[]>([]);
+  const [publishedReviews, setPublishedReviews] = useState(0);
+
+  useEffect(() => {
+    const refreshReviews = () => {
+      setPublishedReviews(getStoredTestimonials().length);
+    };
+    refreshReviews();
+    window.addEventListener('ssr-reviews-changed', refreshReviews);
+    return () => window.removeEventListener('ssr-reviews-changed', refreshReviews);
+  }, []);
 
   useEffect(() => {
     if (!user?.studentId) {
@@ -117,6 +129,10 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ setActiveTab, 
           </p>
           <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block">— Samba Siva Reddy Annem (Head Teacher)</span>
         </div>
+      </div>
+      {/* Reviews Editor for parents */}
+      <div className="pt-6">
+        <ReviewsEditor />
       </div>
     </div>
   );

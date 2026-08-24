@@ -21,6 +21,7 @@ const suggestedAvatars = [
 export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ isOpen, onClose, currentAvatar, onSave }) => {
   const [selectedAvatar, setSelectedAvatar] = useState(currentAvatar || suggestedAvatars[0]);
   const [customUrl, setCustomUrl] = useState('');
+  const [fileName, setFileName] = useState<string | null>(null);
 
   const handleSave = () => {
     const avatarUrl = customUrl.trim() || selectedAvatar;
@@ -36,6 +37,12 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ isOpen, on
         <p className="text-sm text-slate-600 dark:text-slate-300">
           Choose from suggested avatars or enter your own image URL. This will update the profile photo shown in the portal header.
         </p>
+
+        <div className="flex items-center justify-center">
+          <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-700">
+            <img src={selectedAvatar} alt="Preview" className="w-full h-full object-cover" />
+          </div>
+        </div>
 
         <div className="grid grid-cols-3 gap-3">
           {suggestedAvatars.map((avatar) => (
@@ -56,9 +63,36 @@ export const AvatarPickerModal: React.FC<AvatarPickerModalProps> = ({ isOpen, on
             type="url"
             placeholder="https://example.com/avatar.jpg"
             value={customUrl}
-            onChange={(e) => setCustomUrl(e.target.value)}
+            onChange={(e) => { setCustomUrl(e.target.value); setFileName(null); setSelectedAvatar(e.target.value); }}
             className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
           />
+
+          <div className="pt-2">
+            <label className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-2">Or choose a file from the device</label>
+            <div className="flex items-center gap-3">
+              <label className="px-3 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm cursor-pointer hover:bg-slate-200 transition-all">
+                Choose a file from the device
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const f = e.target.files && e.target.files[0];
+                    if (!f) return;
+                    setFileName(f.name);
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      const result = reader.result as string;
+                      setSelectedAvatar(result);
+                      setCustomUrl('');
+                    };
+                    reader.readAsDataURL(f);
+                  }}
+                  className="hidden"
+                />
+              </label>
+              <div className="text-sm text-slate-500 dark:text-slate-400">{fileName || 'No file chosen'}</div>
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center justify-between gap-3">

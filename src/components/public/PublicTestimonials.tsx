@@ -4,15 +4,31 @@ import { Testimonial } from '../../types';
 import { Star } from 'lucide-react';
 import { PageTransition } from '../PageTransition';
 import { staggerContainer, listItem } from '../../lib/animations';
+import { getStoredTestimonials } from '../../lib/reviews';
 
 export const PublicTestimonials: React.FC = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   useEffect(() => {
-    fetch('/api/testimonials')
-      .then(r => r.json())
-      .then(data => setTestimonials(data))
-      .catch(err => console.error(err));
+    const mergeReviews = (serverReviews: Testimonial[], localReviews: Testimonial[]) => {
+      const uniqueReviews = [...localReviews, ...serverReviews].reduce<Testimonial[]>((acc, review) => {
+        if (!acc.some(item => item.id === review.id)) acc.push(review);
+        return acc;
+      }, []);
+      return uniqueReviews;
+    };
+
+    const refresh = () => {
+      const local = getStoredTestimonials();
+      fetch('/api/testimonials')
+        .then(r => r.json())
+        .then(data => setTestimonials(mergeReviews(data, local)))
+        .catch(() => setTestimonials(local));
+    };
+
+    refresh();
+    window.addEventListener('ssr-reviews-changed', refresh);
+    return () => window.removeEventListener('ssr-reviews-changed', refresh);
   }, []);
 
   return (
@@ -34,6 +50,9 @@ export const PublicTestimonials: React.FC = () => {
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-400">
             Discover how single-teacher care and small batches helped hundreds of students reach 90%+ scores in CBSE & State Board.
+          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Showing {testimonials.length} published reviews from current portal contributors and our default testimonials.
           </p>
         </motion.div>
 

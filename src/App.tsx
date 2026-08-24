@@ -104,6 +104,7 @@ export default function App() {
       case 'gallery':
         return <PublicGallery />;
       case 'testimonials':
+      case 'reviews':
         return <PublicTestimonials />;
       case 'contact':
         return <PublicContact onSuccessToast={showToast} />;
@@ -286,8 +287,10 @@ export default function App() {
         onSuccessToast={(msg) => showToast(msg)}
       />
 
-      {/* Footer */}
-      <PublicFooter setActiveTab={setActiveTab} openFreeDemo={openFreeDemo} openAdmission={openAdmission} />
+      {/* Footer (public pages only) */}
+      {!isPortalView && (
+        <PublicFooter setActiveTab={setActiveTab} openFreeDemo={openFreeDemo} openAdmission={openAdmission} />
+      )}
       {isPortalView && (
         <Sidebar
           role={user?.role as 'teacher' | 'student' | 'parent'}

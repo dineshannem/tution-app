@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PageTransition } from '../PageTransition';
 import { staggerContainer, listItem } from '../../lib/animations';
-import { PublicHeader } from './PublicHeader';
 import { PublicFooter } from './PublicFooter';
 import { onlyNumbers, isValidIndianPhone } from '../../lib/validation';
-<PublicHeader
-  title="Courses & Batches (Classes 1–10)"
-  subtitle="Comprehensive curriculum with bilingual Telugu & English explanation."
-  badge="Academic Offerings"
-/>
+import { getStoredTestimonials } from '../../lib/reviews';
+import { Testimonial } from '../../types';
 import {
   GraduationCap,
   Sparkles,
@@ -26,7 +22,6 @@ import {
   Send,
   HelpCircle
 } from 'lucide-react';
-
 
 interface PublicHomeProps {
   setActiveTab: (tab: string) => void;
@@ -51,6 +46,18 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
   });
   const [submittingContact, setSubmittingContact] = useState(false);
   const [phoneError, setPhoneError] = useState('');
+  const [publicReviews, setPublicReviews] = useState<Testimonial[]>([]);
+
+  useEffect(() => {
+    const refresh = () => {
+      const reviews = typeof window !== 'undefined' ? getStoredTestimonials() : [];
+      setPublicReviews(reviews.slice(0, 3));
+    };
+
+    refresh();
+    window.addEventListener('ssr-reviews-changed', refresh);
+    return () => window.removeEventListener('ssr-reviews-changed', refresh);
+  }, []);
 
   const handlePhoneChange = (value: string) => {
     const digits = onlyNumbers(value, 10);
@@ -244,6 +251,32 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                 </div>
               </motion.div>
             </motion.div>
+          </div>
+        </section>
+
+        {/* Testimonials Preview */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-6">
+            <span className="text-xs font-bold text-amber-600 uppercase tracking-widest bg-amber-50 px-3 py-1 rounded-full">What Parents & Students Say</span>
+            <h3 className="text-xl font-extrabold mt-3">Real Reviews from our Portal</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {publicReviews.length > 0 ? publicReviews.map((t, i) => (
+              <div key={t.id || i} className="p-4 rounded-2xl bg-white/95 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <img src={t.avatar || 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150'} className="w-12 h-12 rounded-full object-cover" />
+                  <div>
+                    <div className="text-sm font-bold">{t.name}</div>
+                    <div className="text-[11px] text-slate-500">{t.role}</div>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-700 dark:text-slate-300 mt-3">{t.content}</p>
+              </div>
+            )) : (
+              <div className="md:col-span-3 p-6 rounded-2xl bg-white/95 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-center text-slate-500 dark:text-slate-400">
+                No reviews published yet.
+              </div>
+            )}
           </div>
         </section>
 

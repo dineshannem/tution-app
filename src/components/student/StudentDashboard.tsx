@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { TestResult } from '../../types';
 import { BookOpen, CheckCircle2, Video, FileText, Clock, Award, ArrowUpRight } from 'lucide-react';
+import { ReviewsEditor } from '../common/ReviewsEditor';
+import { getStoredTestimonials } from '../../lib/reviews';
 
 interface StudentDashboardProps {
   setActiveTab: (tab: string) => void;
@@ -13,6 +15,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ setActiveTab
   const [upcomingClasses, setUpcomingClasses] = useState<any[]>([]);
   const [pendingHomework, setPendingHomework] = useState<any[]>([]);
   const [results, setResults] = useState<any[]>([]);
+  const [publishedReviews, setPublishedReviews] = useState(0);
+
+  useEffect(() => {
+    const refreshReviews = () => {
+      setPublishedReviews(getStoredTestimonials().length);
+    };
+    refreshReviews();
+    window.addEventListener('ssr-reviews-changed', refreshReviews);
+    return () => window.removeEventListener('ssr-reviews-changed', refreshReviews);
+  }, []);
 
   useEffect(() => {
     fetch('/api/online-classes')
@@ -97,12 +109,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ setActiveTab
 
         <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
           <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Tuition Batch</span>
-            <span className="text-base font-bold text-slate-900 dark:text-white mt-1 block">Class 10 CBSE</span>
-            <span className="text-[10px] text-amber-700 dark:text-amber-300 font-bold uppercase tracking-wider mt-1 inline-block bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">05:00 PM Batch</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Published Reviews</span>
+            <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-300 mt-1 block">{publishedReviews}</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">Reviews from students & parents</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30 flex items-center justify-center">
-            <BookOpen className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 flex items-center justify-center">
+            <Award className="w-6 h-6" />
           </div>
         </div>
       </div>
@@ -175,6 +187,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ setActiveTab
             <p className="text-xs text-slate-500 dark:text-slate-400 py-6 text-center">No upcoming online classes right now.</p>
           )}
         </div>
+      </div>
+      {/* Reviews Editor */}
+      <div className="pt-6 lg:pt-8">
+        <ReviewsEditor />
       </div>
     </div>
   );

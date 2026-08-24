@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Student } from '../../types';
+import { Student, EducationalBoard } from '../../types';
 import { motion } from 'motion/react';
 import { Search, UserPlus, Edit3, Eye, Trash2, CheckCircle2, XCircle } from 'lucide-react';
 import { Modal } from '../common/Modal';
@@ -17,12 +17,14 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ onSuccessT
   const [selectedBatch, setSelectedBatch] = useState('All');
   const [selectedClass, setSelectedClass] = useState('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [viewStudent, setViewStudent] = useState<Student | null>(null);
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
     class: 'Class 10',
-    board: 'CBSE' as 'CBSE' | 'State Board',
+    board: 'CBSE' as EducationalBoard,
     batchId: '',
     batchName: '',
     email: '',
@@ -96,7 +98,8 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ onSuccessT
     const matchesSearch =
       s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.rollNo.includes(searchTerm) ||
-      s.email.toLowerCase().includes(searchTerm.toLowerCase());
+      s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.parentName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesBatch = selectedBatch === 'All' || s.batchId === selectedBatch;
     const matchesClass = selectedClass === 'All' || s.class === selectedClass;
     return matchesSearch && matchesBatch && matchesClass;
@@ -193,13 +196,36 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ onSuccessT
                       <CheckCircle2 className="w-3 h-3" /> Active
                     </span>
                   </td>
-                  <td className="p-4 text-right">
+                  <td className="p-4 text-right space-x-1">
                     <button
                       onClick={() => setViewStudent(student)}
-                      className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-lg transition-colors"
+                      className="p-1.5 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors"
                       title="View Details"
                     >
                       <Eye className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingStudent(student);
+                        setFormData({
+                          name: student.name,
+                          class: student.class,
+                          board: student.board,
+                          batchId: student.batchId,
+                          batchName: student.batchName,
+                          email: student.email,
+                          phone: student.phone,
+                          parentName: student.parentName,
+                          parentEmail: student.parentEmail,
+                          parentPhone: student.parentPhone,
+                          address: student.address
+                        });
+                        setIsEditModalOpen(true);
+                      }}
+                      className="p-1.5 text-amber-600 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-950 rounded-lg transition-colors"
+                      title="Edit Student"
+                    >
+                      <Edit3 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
@@ -313,6 +339,121 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({ onSuccessT
             className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow transition-colors"
           >
             Save & Enroll Student
+          </button>
+        </form>
+      </Modal>
+
+      {/* Edit Student Modal */}
+      <Modal isOpen={isEditModalOpen} onClose={() => { setIsEditModalOpen(false); setEditingStudent(null); }} title="Edit Student Details">
+        <form onSubmit={async (e) => {
+          e.preventDefault();
+          if (!editingStudent) return;
+          try {
+            const payload = {
+              name: formData.name,
+              parentName: formData.parentName,
+              parentEmail: formData.parentEmail,
+              parentPhone: formData.parentPhone,
+              email: formData.email,
+              address: formData.address
+            };
+            const res = await fetch(`/api/students/${editingStudent.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+              onSuccessToast(`Updated ${data.student.name} successfully.`);
+              setIsEditModalOpen(false);
+              setEditingStudent(null);
+              loadData();
+            } else {
+              onSuccessToast('Failed to update student details.');
+            }
+          } catch (err) {
+            onSuccessToast('Failed to update student details.');
+          }
+        }} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Student Name *</label>
+              <input
+                type="text"
+                required
+                placeholder="Student full name"
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Student Email</label>
+              <input
+                type="email"
+                placeholder="student email"
+                value={formData.email}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Parent Name *</label>
+              <input
+                type="text"
+                required
+                placeholder="Parent full name"
+                value={formData.parentName}
+                onChange={e => setFormData({ ...formData, parentName: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Parent Email</label>
+              <input
+                type="email"
+                placeholder="parent email"
+                value={formData.parentEmail}
+                onChange={e => setFormData({ ...formData, parentEmail: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Parent Mobile No.</label>
+              <input
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={10}
+                placeholder="9876543210"
+                value={formData.parentPhone}
+                onChange={e => setFormData({ ...formData, parentPhone: onlyNumbers(e.target.value) })}
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Address</label>
+              <input
+                type="text"
+                placeholder="Student address"
+                value={formData.address}
+                onChange={e => setFormData({ ...formData, address: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow transition-colors"
+          >
+            Save Changes
           </button>
         </form>
       </Modal>

@@ -254,17 +254,19 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/90 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100 transition-colors shadow-sm w-full max-w-full overflow-x-clip">
       
       {/* Role Switcher Top Bar (Clean & Compact) */}
-      <div className="bg-slate-900 text-slate-200 text-xs py-1.5 px-3 sm:px-4 flex flex-wrap items-center justify-between border-b border-slate-800 backdrop-blur-md w-full max-w-full min-w-0">
-        <div className="flex items-center gap-2 font-medium shrink min-w-0">
-          <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shrink-0">
-            SSR Portal Hub
-          </span>
-          <span className="hidden md:inline text-slate-300 text-[11px] truncate">
-            Switch role to test portals or view public site:
-          </span>
+      <div className="bg-slate-900 text-slate-200 text-xs py-1.5 px-3 sm:px-4 relative border-b border-slate-800 backdrop-blur-md w-full max-w-full min-w-0">
+        <div className="absolute inset-x-0 flex items-center justify-center pointer-events-none overflow-hidden">
+          <div className="flex items-center gap-3 min-w-0 whitespace-nowrap text-center">
+            <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shrink-0">
+              SSR Portal Hub
+            </span>
+            <span className="text-slate-300 text-[11px] truncate max-w-full">
+              Switch role to test portals or view public site:
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-0.5 scrollbar-none max-w-full min-w-0 shrink">
+        <div className="relative flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-0.5 scrollbar-none max-w-full min-w-0 justify-end">
           <button
             onClick={() => handlePortalSwitch('guest', 'home')}
             className={`rounded-lg transition-all whitespace-nowrap ${
@@ -310,10 +312,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Main Header Row */}
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-w-0">
-        <div className="flex items-center justify-between h-16 gap-2 sm:gap-4 min-w-0">
-          
-          {/* Top Left Corner Branding */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink min-w-0 overflow-hidden">
+        <div className="grid grid-cols-3 items-center h-16 gap-2 sm:gap-4 min-w-0">
+          <div />
+          {/* Center Branding */}
+          <div className="flex items-center justify-center gap-2 sm:gap-3 shrink min-w-0 overflow-hidden">
             <div
               onClick={() => setActiveTab(role === 'guest' ? 'home' : `${role.charAt(0)}_dashboard`)}
               className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group min-w-0"
@@ -321,8 +323,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform border border-white/30 shrink-0">
                 <GraduationCap className="w-5 h-5" />
               </div>
-              <div className="min-w-0 overflow-hidden">
-                <div className="flex items-center gap-1 sm:gap-1.5">
+              <div className="min-w-0 overflow-hidden text-center">
+                <div className="flex items-center justify-center gap-1 sm:gap-1.5">
                   <span className="text-sm sm:text-base lg:text-lg font-black tracking-tight text-slate-900 dark:text-white truncate">
                     SSR TUITION
                   </span>
@@ -338,7 +340,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Action Controls: Notifications, Theme Mode Toggle, Login/Logout, Hamburger */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center justify-end gap-2 shrink-0">
             {role === 'guest' && (
               <div className="hidden lg:flex items-center gap-2">
                 <button
@@ -633,9 +635,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     />
                     <span className="sr-only">Edit avatar</span>
                   </button>
-                  <div className="hidden md:block text-left">
-                    <div className="text-xs font-bold text-slate-900 dark:text-white leading-tight">{user.name}</div>
-                    <div className="text-[10px] text-indigo-600 dark:text-indigo-300 font-extrabold capitalize">{user.role}</div>
+                  <div className="hidden md:block text-left max-w-[12rem] md:max-w-[18rem] truncate">
+                    <div className="text-xs font-bold text-slate-900 dark:text-white leading-tight truncate">{user.name}</div>
+                    <div className="text-[10px] text-indigo-600 dark:text-indigo-300 font-extrabold capitalize truncate">{user.role}</div>
                   </div>
                 </div>
                 <button

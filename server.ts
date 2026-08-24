@@ -1,10 +1,12 @@
 import express from "express";
+import os from "os";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST || "0.0.0.0";
 
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
@@ -769,6 +771,51 @@ app.post("/api/students", (req, res) => {
   res.json({ success: true, student: newStudent });
 });
 
+app.patch("/api/students/:id", (req, res) => {
+  const student = db.students.find((item) => item.id === req.params.id);
+  if (!student) {
+    return res.status(404).json({ success: false, error: "Student not found." });
+  }
+
+  const updatableFields = [
+    'name',
+    'email',
+    'phone',
+    'parentName',
+    'parentEmail',
+    'parentPhone',
+    'address'
+  ];
+
+  updatableFields.forEach((field) => {
+    if (req.body[field] !== undefined) {
+      student[field] = req.body[field];
+    }
+  });
+
+  db.credentials.forEach((cred) => {
+    if (cred.role === 'student' && cred.studentId === student.id) {
+      if (req.body.name !== undefined) cred.name = req.body.name;
+      if (req.body.email !== undefined) cred.email = req.body.email;
+      if (req.body.class !== undefined) cred.class = req.body.class;
+      if (req.body.board !== undefined) cred.board = req.body.board;
+      cred.lastUpdated = new Date().toISOString().split('T')[0];
+    }
+
+    if (cred.role === 'parent' && cred.studentId === student.id) {
+      if (req.body.parentName !== undefined) cred.name = req.body.parentName;
+      if (req.body.parentEmail !== undefined) cred.email = req.body.parentEmail;
+      if (req.body.parentPhone !== undefined) cred.phone = req.body.parentPhone;
+      if (req.body.name !== undefined) cred.studentName = req.body.name;
+      cred.lastUpdated = new Date().toISOString().split('T')[0];
+    }
+  });
+
+  syncCredentialsFile();
+
+  res.json({ success: true, student });
+});
+
 app.post("/api/admission-requests/:id/approve", (req, res) => {
   const admission = db.admissionRequests.find(a => a.id === req.params.id);
   if (!admission) {
@@ -1520,8 +1567,19 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`SSR Tuition Management System server running at http://localhost:${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`SSR Tuition Management System server running at http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT}`);
+
+    if (HOST === "0.0.0.0") {
+      const interfaces = os.networkInterfaces();
+      Object.values(interfaces).forEach((iface) => {
+        iface?.forEach((addr) => {
+          if (addr.family === "IPv4" && !addr.internal) {
+            console.log(`Accessible on: http://${addr.address}:${PORT}`);
+          }
+        });
+      });
+    }
   });
 }
 
