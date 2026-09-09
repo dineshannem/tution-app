@@ -33,7 +33,7 @@ export const PublicTestimonials: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      <div className="public-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
         
         {/* Header */}
         <motion.div
@@ -68,7 +68,7 @@ export const PublicTestimonials: React.FC = () => {
             <motion.div
               key={t.id}
               variants={listItem}
-              whileHover={{ y: -20 }}
+              whileHover={{ y: -4 }}
               className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-md flex flex-col justify-between space-y-4"
             >
               <div className="space-y-3">

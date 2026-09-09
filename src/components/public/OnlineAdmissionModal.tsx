@@ -54,18 +54,21 @@ export const OnlineAdmissionModal: React.FC<OnlineAdmissionModalProps> = ({
     setLoading(true);
 
     try {
-      await fetch('/api/admission', {
+      const res = await fetch('/api/admission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Unable to submit admission application.');
+      }
       setLoading(false);
       setSubmitted(true);
       onSuccessToast("Online Admission application submitted successfully!");
     } catch (err) {
       setLoading(false);
-      setSubmitted(true);
-      onSuccessToast("Online Admission application submitted successfully!");
+      setError(err instanceof Error ? err.message : 'Unable to submit application. Please try again.');
     }
   };
 

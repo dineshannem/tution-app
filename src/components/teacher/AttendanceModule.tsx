@@ -155,7 +155,6 @@ export const AttendanceModule: React.FC<AttendanceModuleProps> = ({ onSuccessToa
               onChange={e => setSelectedBatch(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="all">⭐ All Batches (All 50 Students)</option>
               {batches.map(b => (
                 <option key={b.id} value={b.id}>{b.name} ({b.class})</option>
               ))}
@@ -211,6 +210,7 @@ export const AttendanceModule: React.FC<AttendanceModuleProps> = ({ onSuccessToa
                 <th className="p-3 border-r border-slate-300 dark:border-slate-700 w-12 text-center font-mono">Row</th>
                 <th className="p-3 border-r border-slate-300 dark:border-slate-700 w-24 font-mono">Roll No</th>
                 <th className="p-3 border-r border-slate-300 dark:border-slate-700">Student Name</th>
+                <th className="p-3 border-r border-slate-300 dark:border-slate-700">Board</th>
                 <th className="p-3 border-r border-slate-300 dark:border-slate-700">Mark Status</th>
                 <th className="p-3">Teacher Remark</th>
               </tr>
@@ -228,6 +228,9 @@ export const AttendanceModule: React.FC<AttendanceModuleProps> = ({ onSuccessToa
                     </td>
                     <td className="p-3 border-r border-slate-200 dark:border-slate-800 font-bold text-slate-900 dark:text-white">
                       {s.name}
+                    </td>
+                    <td className="p-3 border-r border-slate-200 dark:border-slate-800 font-semibold text-slate-600 dark:text-slate-300">
+                      {s.board || 'Not set'}
                     </td>
                     <td className="p-3 border-r border-slate-200 dark:border-slate-800">
                       <div className="flex items-center gap-1.5">

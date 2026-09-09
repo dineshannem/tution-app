@@ -199,7 +199,7 @@ export const HomeworkModule: React.FC<HomeworkModuleProps> = ({ onSuccessToast }
       ) : (
         /* Submissions List */
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-          <table className="w-full text-left border-collapse">
+          <table className="table-scroll w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
                 <th className="p-4">Student Name</th>

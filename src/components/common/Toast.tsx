@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, AlertCircle, X, Info } from 'lucide-react';
 
@@ -9,11 +9,6 @@ interface ToastProps {
 }
 
 export const Toast: React.FC<ToastProps> = ({ message, type = 'success', onClose }) => {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 4200);
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
   const bgColors = {
     success: 'bg-emerald-600 text-white border-emerald-500/50 shadow-emerald-600/30',
     error: 'bg-rose-600 text-white border-rose-500/50 shadow-rose-600/30',
@@ -33,7 +28,8 @@ export const Toast: React.FC<ToastProps> = ({ message, type = 'success', onClose
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 24, scale: 0.9 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-        className={`fixed bottom-16 left-1/2 -translate-x-1/2 sm:right-6 sm:left-auto sm:translate-x-0 sm:bottom-6 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl border ${bgColors[type]} backdrop-blur-md max-w-[min(100vw-2rem,22rem)]`}
+        onClick={onClose}
+        className={`fixed bottom-16 left-1/2 -translate-x-1/2 sm:right-6 sm:left-auto sm:translate-x-0 sm:bottom-6 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl border ${bgColors[type]} backdrop-blur-md max-w-[min(100vw-2rem,22rem)] cursor-pointer`}
       >
         {icons[type]}
         <p className="text-xs sm:text-sm font-bold tracking-tight">{message}</p>

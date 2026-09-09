@@ -18,7 +18,9 @@ export const StudyMaterialModule: React.FC<StudyMaterialModuleProps> = ({ onSucc
     category: 'PDF' as 'PDF' | 'DOC' | 'Video' | 'Notes',
     fileName: '',
     fileUrl: '',
-    videoUrl: ''
+    videoUrl: '',
+    description: '',
+    extraInfo: ''
   });
 
   const loadMaterials = () => {
@@ -94,6 +96,8 @@ export const StudyMaterialModule: React.FC<StudyMaterialModuleProps> = ({ onSucc
                 </span>
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white leading-snug">{m.title}</h3>
+              <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{m.description || 'Open this material to read the topic overview and study guidance.'}</p>
+              {m.extraInfo && <p className="text-[11px] text-indigo-600 dark:text-indigo-300">{m.extraInfo}</p>}
             </div>
 
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
@@ -135,6 +139,15 @@ export const StudyMaterialModule: React.FC<StudyMaterialModuleProps> = ({ onSucc
               onChange={e => setFormData({ ...formData, title: e.target.value })}
               className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500"
             />
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Topic Description *</label>
+            <textarea required value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full h-20 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none" placeholder="Explain what students will learn..." />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Extra Reading Information</label>
+            <textarea value={formData.extraInfo} onChange={e => setFormData({ ...formData, extraInfo: e.target.value })} className="w-full h-16 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none" placeholder="Add tips, prerequisites, or key takeaways..." />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

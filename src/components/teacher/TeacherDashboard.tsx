@@ -7,11 +7,8 @@ import {
   CheckCircle2,
   Clock,
   Video,
-  FileText,
   Plus,
   ArrowUpRight,
-  TrendingUp,
-  AlertCircle,
   Sparkles,
   Phone
 } from 'lucide-react';
@@ -77,179 +74,177 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ setActiveTab
 
   return (
     <PageTransition>
-      <div className="space-y-8">
-        {/* Welcome Banner */}
-        <div className="bg-gradient-to-r from-indigo-950/80 via-slate-900/90 to-purple-950/80 p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden border border-white/10 backdrop-blur-xl">
-        <div className="relative z-10 space-y-2">
-          <div className="flex items-center gap-2 text-amber-300 text-xs font-bold uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full w-fit">
-            Owner & Head Teacher Portal
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Welcome back, {user?.name || 'Teacher'}!</h1>
-          <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
-            Here is your daily control overview for Classes 1–10. Manage students, evaluate homework, schedule Google Meet sessions, and track fee payments.
-          </p>
-
-          <div className="flex flex-wrap gap-3 pt-4">
-            <button
-              onClick={() => setActiveTab('t_homework')}
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-lg shadow-amber-500/20 flex items-center gap-1.5"
-            >
-              <Plus className="w-4 h-4" /> Add Homework
-            </button>
-            <button
-              onClick={() => setActiveTab('t_online_classes')}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-lg shadow-indigo-500/25 border border-indigo-400/30 flex items-center gap-1.5"
-            >
-              <Video className="w-4 h-4" /> Schedule Google Meet
-            </button>
-            <button
-              onClick={() => setActiveTab('t_attendance')}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-all border border-white/10 flex items-center gap-1.5 backdrop-blur-md"
-            >
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Mark Attendance
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
-          <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total Active Students</span>
-            <span className="text-3xl font-bold text-slate-900 dark:text-white mt-1 block">{studentsCount}</span>
-            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-wider mt-1 inline-block bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">Classes 1 to 10</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 flex items-center justify-center">
-            <Users className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
-          <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Active Batches</span>
-            <span className="text-3xl font-bold text-slate-900 dark:text-white mt-1 block">{batchesCount}</span>
-            <span className="text-[10px] text-indigo-700 dark:text-indigo-300 font-bold uppercase tracking-wider mt-1 inline-block bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full">CBSE & State Board</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30 flex items-center justify-center">
-            <BookOpen className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
-          <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Fees Collected</span>
-            <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">₹{totalRevenue.toLocaleString('en-IN')}</span>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">Pending: ₹{pendingFees.toLocaleString('en-IN')}</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 flex items-center justify-center">
-            <DollarSign className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
-          <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Pending Admission Requests</span>
-            <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-300 mt-1 block">{pendingAdmissions}</span>
-            <span className="text-[10px] text-indigo-700 dark:text-indigo-300 font-bold uppercase tracking-wider mt-1 inline-block bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full">New applications</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 flex items-center justify-center">
-            <Sparkles className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
-          <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Pending Demo Requests</span>
-            <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">{pendingDemos}</span>
-            <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider mt-1 inline-block bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">New trial bookings</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 flex items-center justify-center">
-            <CheckCircle2 className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
-          <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">New Enquiries</span>
-            <span className="text-3xl font-bold text-purple-600 dark:text-purple-300 mt-1 block">{pendingEnquiries}</span>
-            <span className="text-[10px] text-purple-700 dark:text-purple-300 font-bold uppercase tracking-wider mt-1 inline-block bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">Contact messages</span>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30 flex items-center justify-center">
-            <Phone className="w-6 h-6" />
-          </div>
-        </div>
-      </div>
-
-      {/* Charts & Upcoming Classes Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Revenue Analytics Chart */}
-        <div className="lg:col-span-7 bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Monthly Revenue Analytics</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Razorpay and direct fee collection summary</p>
+      <div className="space-y-6 sm:space-y-8 max-w-full">
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 p-5 shadow-2xl sm:p-7 lg:p-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(168,85,247,0.35),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.28),_transparent_28%)]" />
+          <div className="relative z-10 space-y-3">
+            <div className="flex w-fit items-center gap-2 rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-amber-300">
+              Owner & Head Teacher Portal
             </div>
-            <button onClick={() => setActiveTab('t_fees')} className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 flex items-center gap-1 transition-colors">
-              Fee Details <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+            <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">Welcome back, {user?.name || 'Teacher'}!</h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-slate-300">
+              Here is your daily control overview for Classes 1–10. Manage students, evaluate homework, schedule Google Meet sessions, and track fee payments.
+            </p>
 
-          <div className="h-64 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={revenueChartData}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip
-                  formatter={(val: number) => [`₹${val.toLocaleString('en-IN')}`, 'Revenue']}
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px', color: '#fff', backdropFilter: 'blur(12px)' }}
-                />
-                <Bar dataKey="revenue" fill="#6366f1" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <button
+                onClick={() => setActiveTab('t_homework')}
+                className="flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2.5 text-[11px] font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 transition-transform hover:-translate-y-0.5"
+              >
+                <Plus className="w-4 h-4" /> Add Homework
+              </button>
+              <button
+                onClick={() => setActiveTab('t_online_classes')}
+                className="flex items-center gap-1.5 rounded-xl border border-indigo-400/30 bg-indigo-600 px-4 py-2.5 text-[11px] font-extrabold text-white shadow-lg shadow-indigo-500/25 transition-transform hover:-translate-y-0.5"
+              >
+                <Video className="w-4 h-4" /> Schedule Google Meet
+              </button>
+              <button
+                onClick={() => setActiveTab('t_attendance')}
+                className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/10 px-4 py-2.5 text-[11px] font-extrabold text-white backdrop-blur-md transition-transform hover:-translate-y-0.5"
+              >
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Mark Attendance
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Upcoming Google Meet Classes */}
-        <div className="lg:col-span-5 bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Upcoming Google Meet Classes</h3>
-            <button onClick={() => setActiveTab('t_online_classes')} className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition-colors">
-              Manage
-            </button>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+            <div>
+              <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Total Active Students</span>
+              <span className="mt-2 block text-3xl font-black text-slate-900 dark:text-white">{studentsCount}</span>
+              <span className="mt-2 inline-block rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-emerald-700 dark:text-emerald-400">Classes 1 to 10</span>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
+              <Users className="h-6 w-6" />
+            </div>
           </div>
 
-          <div className="space-y-3">
-            {upcomingClasses.length > 0 ? (
-              upcomingClasses.map(c => (
-                <div key={c.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 space-y-2 backdrop-blur-md">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-500/20 border border-indigo-500/30 px-2 py-0.5 rounded">
-                      {c.subject} - {c.class}
-                    </span>
-                    <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" /> {c.startTime}
-                    </span>
+          <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+            <div>
+              <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Active Batches</span>
+              <span className="mt-2 block text-3xl font-black text-slate-900 dark:text-white">{batchesCount}</span>
+              <span className="mt-2 inline-block rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-indigo-700 dark:text-indigo-300">CBSE & State Board</span>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-600 dark:text-purple-300">
+              <BookOpen className="h-6 w-6" />
+            </div>
+          </div>
+
+          <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+            <div>
+              <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Fees Collected</span>
+              <span className="mt-2 block text-3xl font-black text-emerald-600 dark:text-emerald-400">₹{totalRevenue.toLocaleString('en-IN')}</span>
+              <span className="mt-2 block text-[11px] text-slate-500 dark:text-slate-400">Pending: ₹{pendingFees.toLocaleString('en-IN')}</span>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+              <DollarSign className="h-6 w-6" />
+            </div>
+          </div>
+
+          <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+            <div>
+              <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Pending Admissions</span>
+              <span className="mt-2 block text-3xl font-black text-indigo-600 dark:text-indigo-300">{pendingAdmissions}</span>
+              <span className="mt-2 inline-block rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-indigo-700 dark:text-indigo-300">New applications</span>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
+              <Sparkles className="h-6 w-6" />
+            </div>
+          </div>
+
+          <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+            <div>
+              <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Pending Demo Requests</span>
+              <span className="mt-2 block text-3xl font-black text-emerald-600 dark:text-emerald-400">{pendingDemos}</span>
+              <span className="mt-2 inline-block rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-emerald-700 dark:text-emerald-300">New trial bookings</span>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+              <CheckCircle2 className="h-6 w-6" />
+            </div>
+          </div>
+
+          <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+            <div>
+              <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">New Enquiries</span>
+              <span className="mt-2 block text-3xl font-black text-purple-600 dark:text-purple-300">{pendingEnquiries}</span>
+              <span className="mt-2 inline-block rounded-full border border-purple-500/20 bg-purple-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-purple-700 dark:text-purple-300">Contact messages</span>
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-600 dark:text-purple-300">
+              <Phone className="h-6 w-6" />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="space-y-4 rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 lg:col-span-7">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-black text-slate-900 dark:text-white">Monthly Revenue Analytics</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Razorpay and direct fee collection summary</p>
+              </div>
+              <button onClick={() => setActiveTab('t_fees')} className="flex items-center gap-1 text-xs font-extrabold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-400">
+                Fee Details <ArrowUpRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            <div className="h-64 w-full pt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={revenueChartData}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                  <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
+                  <YAxis stroke="#64748b" fontSize={12} />
+                  <Tooltip
+                    formatter={(val: number) => [`₹${val.toLocaleString('en-IN')}`, 'Revenue']}
+                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px', color: '#fff', backdropFilter: 'blur(12px)' }}
+                  />
+                  <Bar dataKey="revenue" fill="#6366f1" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="space-y-4 rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80 lg:col-span-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-black text-slate-900 dark:text-white">Upcoming Google Meet Classes</h3>
+              <button onClick={() => setActiveTab('t_online_classes')} className="text-xs font-extrabold text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-400">
+                Manage
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {upcomingClasses.length > 0 ? (
+                upcomingClasses.map(c => (
+                  <div key={c.id} className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4 backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="rounded border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-indigo-700 dark:text-indigo-300">
+                        {c.subject} - {c.class}
+                      </span>
+                      <span className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
+                        <Clock className="h-3.5 w-3.5" /> {c.startTime}
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-extrabold text-slate-900 dark:text-white">{c.title}</h4>
+                    <a
+                      href={c.meetLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-400/30 bg-emerald-600 px-3 py-1.5 text-xs font-extrabold text-white shadow-md shadow-emerald-500/20 transition-transform hover:-translate-y-0.5"
+                    >
+                      <Video className="h-3.5 w-3.5" /> Join Google Meet
+                    </a>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white">{c.title}</h4>
-                  <a
-                    href={c.meetLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 rounded-xl transition-all shadow-md shadow-emerald-500/20 border border-emerald-400/30 mt-1"
-                  >
-                    <Video className="w-3.5 h-3.5" /> Join Google Meet
-                  </a>
+                ))
+              ) : (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-6 text-center text-xs text-slate-500 dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-400">
+                  No upcoming online classes scheduled.
                 </div>
-              ))
-            ) : (
-              <p className="text-xs text-slate-500 dark:text-slate-400 text-center py-8">No upcoming online classes scheduled.</p>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </PageTransition>
   );
 };

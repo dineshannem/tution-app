@@ -50,23 +50,27 @@ export const PublicContact: React.FC<PublicContactProps> = ({ onSuccessToast }) 
 
     setLoading(true);
     try {
-      await fetch('/api/contact', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Unable to send enquiry.');
+      }
       setLoading(false);
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       onSuccessToast("Enquiry message sent! SSR Sir will contact you shortly.");
     } catch (err) {
       setLoading(false);
-      onSuccessToast("Enquiry sent successfully!");
+      setError(err instanceof Error ? err.message : 'Unable to send enquiry. Please try again.');
     }
   };
 
   return (
     <PageTransition>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      <div className="public-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
         
         {/* Header */}
         <motion.div
@@ -90,7 +94,7 @@ export const PublicContact: React.FC<PublicContactProps> = ({ onSuccessToast }) 
           
           {/* Left - Contact Info */}
           <motion.div
-            initial={{ opacity: 0, x: -300 }}
+            initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 2 }}

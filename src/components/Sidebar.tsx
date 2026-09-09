@@ -55,6 +55,10 @@ const teacherSections = [
       { id: 't_enquiries', label: 'Public Enquiries', icon: MessageSquare },
       { id: 't_demos', label: 'Demo Requests', icon: Sparkles },
       { id: 't_gallery', label: 'Gallery Admin', icon: Image },
+      { id: 't_payment_history', label: 'Payment History', icon: CreditCard },
+      { id: 't_approval_history', label: 'Approval History', icon: ClipboardList },
+      { id: 't_demo_history', label: 'Demo History', icon: ClipboardList },
+      { id: 't_enquiry_history', label: 'Enquiry History', icon: MessageSquare },
     ]
   },
   {

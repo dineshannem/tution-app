@@ -4,7 +4,7 @@ import { User, UserRole } from '../types';
 interface AuthContextType {
   user: User | null;
   role: UserRole | 'guest';
-  login: (usernameOrEmail: string, password?: string, role?: UserRole) => Promise<{ success: boolean; message?: string; user?: User }>;
+  login: (usernameOrEmail: string, password?: string, role?: UserRole, captchaToken?: string, captchaAnswer?: string) => Promise<{ success: boolean; message?: string; user?: User; retryAfterMs?: number; attemptsRemaining?: number }>;
   logout: () => void;
   switchRole: (role: UserRole | 'guest') => void;
   updateUser: (user: User) => void;
@@ -67,13 +67,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (
     usernameOrEmail: string,
     password?: string,
-    requestedRole: UserRole = 'student'
-  ): Promise<{ success: boolean; message?: string; user?: User }> => {
+    requestedRole: UserRole = 'student',
+    captchaToken?: string,
+    captchaAnswer?: string
+  ): Promise<{ success: boolean; message?: string; user?: User; retryAfterMs?: number; attemptsRemaining?: number }> => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: usernameOrEmail, email: usernameOrEmail, password, role: requestedRole })
+        body: JSON.stringify({ username: usernameOrEmail, email: usernameOrEmail, password, role: requestedRole, captchaToken, captchaAnswer })
       });
       const data = await res.json();
       if (res.ok && data.success && data.user) {
@@ -81,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setRole(data.user.role);
         return { success: true, user: data.user };
       } else if (data.error) {
-        return { success: false, message: data.error };
+        return { success: false, message: data.error, retryAfterMs: data.retryAfterMs, attemptsRemaining: data.attemptsRemaining };
       }
     } catch (err) {
       console.error('Login error:', err);

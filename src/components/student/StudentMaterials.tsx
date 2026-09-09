@@ -47,6 +47,8 @@ export const StudentMaterials: React.FC = () => {
                 </span>
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">{m.title}</h3>
+              <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{m.description || 'Read the topic overview before opening the resource.'}</p>
+              {m.extraInfo && <p className="text-[11px] text-indigo-600 dark:text-indigo-300">{m.extraInfo}</p>}
             </div>
 
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">

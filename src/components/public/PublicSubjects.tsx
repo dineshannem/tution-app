@@ -156,7 +156,7 @@ export const PublicSubjects: React.FC<PublicSubjectsProps> = ({ openFreeDemo, op
 
   return (
     <PageTransition>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+      <div className="public-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -185,7 +185,7 @@ export const PublicSubjects: React.FC<PublicSubjectsProps> = ({ openFreeDemo, op
     <motion.button
       key={cf}
       variants={listItem}
-      whileHover={{ y: -20, scale: 1.16 }}
+      whileHover={{ y: -4, scale: 1.03 }}
       whileTap={{ scale: 0.96 }}
       onClick={() => setSelectedClass(cf)}
       className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
@@ -213,7 +213,7 @@ export const PublicSubjects: React.FC<PublicSubjectsProps> = ({ openFreeDemo, op
             <motion.div
   key={subject.id}
   variants={listItem}
-  whileHover={{ y: -30 }}
+  whileHover={{ y: -4, scale: 1.01 }}
   className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all space-y-6 flex flex-col justify-between"
 >
               <div className="space-y-4">
@@ -267,7 +267,7 @@ export const PublicSubjects: React.FC<PublicSubjectsProps> = ({ openFreeDemo, op
               {/* Action Buttons */}
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
   <motion.button
-    whileHover={{ scale: 1.1 }}
+    whileHover={{ scale: 1.03 }}
     whileTap={{ scale: 0.97 }}
     onClick={openFreeDemo}
     className="flex-1 py-2.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs shadow"
@@ -275,7 +275,7 @@ export const PublicSubjects: React.FC<PublicSubjectsProps> = ({ openFreeDemo, op
     Book Demo Class
   </motion.button>
   <motion.button
-    whileHover={{ scale: 1.1 }}
+    whileHover={{ scale: 1.03 }}
     whileTap={{ scale: 0.97 }}
     onClick={openAdmission}
     className="flex-1 py-2.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow"

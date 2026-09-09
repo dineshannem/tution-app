@@ -10,6 +10,7 @@ interface BatchManagementProps {
 export const BatchManagement: React.FC<BatchManagementProps> = ({ onSuccessToast }) => {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingBatchId, setEditingBatchId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     class: 'Class 10',
@@ -34,21 +35,28 @@ export const BatchManagement: React.FC<BatchManagementProps> = ({ onSuccessToast
   const handleCreateBatch = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/batches', {
-        method: 'POST',
+      const res = await fetch(editingBatchId ? `/api/batches/${editingBatchId}` : '/api/batches', {
+        method: editingBatchId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
       const data = await res.json();
       if (data.success) {
-        onSuccessToast(`Batch ${data.batch.name} created successfully!`);
+        onSuccessToast(`Batch ${data.batch.name} ${editingBatchId ? 'updated' : 'created'} successfully!`);
         setIsModalOpen(false);
+        setEditingBatchId(null);
         loadBatches();
       }
     } catch (err) {
       onSuccessToast('Batch created!');
       setIsModalOpen(false);
     }
+  };
+
+  const editBatch = (batch: Batch) => {
+    setEditingBatchId(batch.id);
+    setFormData({ name: batch.name, class: batch.class, board: batch.board as any, subject: batch.subject, schedule: batch.schedule, time: batch.time, maxStudents: batch.maxStudents });
+    setIsModalOpen(true);
   };
 
   return (
@@ -102,13 +110,15 @@ export const BatchManagement: React.FC<BatchManagementProps> = ({ onSuccessToast
             </div>
 
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400">
-              Single teacher instruction by SSR Sir
+              <button onClick={() => editBatch(batch)} className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
+                <Edit2 className="w-3.5 h-3.5" /> Edit running batch
+              </button>
             </div>
           </div>
         ))}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Tuition Batch">
+      <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingBatchId(null); }} title={editingBatchId ? 'Edit Running Tuition Batch' : 'Create New Tuition Batch'}>
         <form onSubmit={handleCreateBatch} className="space-y-4">
           <div>
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Batch Name *</label>
@@ -120,6 +130,11 @@ export const BatchManagement: React.FC<BatchManagementProps> = ({ onSuccessToast
               onChange={e => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none"
             />
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Subjects *</label>
+            <input required value={formData.subject} onChange={e => setFormData({ ...formData, subject: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -180,7 +195,7 @@ export const BatchManagement: React.FC<BatchManagementProps> = ({ onSuccessToast
             type="submit"
             className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow transition-colors"
           >
-            Create Batch
+            {editingBatchId ? 'Save Batch Changes' : 'Create Batch'}
           </button>
         </form>
       </Modal>

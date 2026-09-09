@@ -98,12 +98,12 @@ export const StudentAttendance: React.FC = () => {
       </div>
 
       {/* Filter bar */}
-      <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
           <Filter className="w-4 h-4 text-indigo-500" />
           <span>Filter Status:</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {(['all', 'present', 'absent', 'late'] as const).map(st => (
             <button
               key={st}
@@ -122,7 +122,7 @@ export const StudentAttendance: React.FC = () => {
 
       {/* Attendance Register Table */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-        <table className="w-full text-left border-collapse">
+        <table className="table-scroll w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-800/60 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
               <th className="p-4">Date</th>

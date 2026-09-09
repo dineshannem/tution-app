@@ -40,28 +40,29 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ setActiveTab, 
     : 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-teal-950/80 p-8 rounded-3xl text-white shadow-2xl relative overflow-hidden border border-white/10 backdrop-blur-2xl">
-        <div className="relative z-10 space-y-2">
-          <span className="text-xs font-bold text-amber-300 uppercase tracking-wider bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+      <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 p-5 shadow-2xl sm:p-7 lg:p-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(52,211,153,0.32),_transparent_32%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.28),_transparent_28%)]" />
+        <div className="relative z-10 space-y-3">
+          <span className="inline-flex rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-amber-300">
             Parent Portal • Academic Monitoring Desk
           </span>
-          <h1 className="text-3xl font-extrabold tracking-tight">Welcome back, {user?.name || 'Parent'}!</h1>
-          <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">Welcome back, {user?.name || 'Parent'}!</h1>
+          <p className="max-w-2xl text-sm leading-relaxed text-slate-300">
             Monitor your child's daily attendance, homework submission rate, test performance, and pay monthly tuition fees securely via Razorpay.
           </p>
 
-          <div className="flex flex-wrap gap-3 pt-4">
+          <div className="flex flex-wrap gap-3 pt-2">
             <button
               onClick={openPayModal}
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-lg shadow-amber-500/20 flex items-center gap-1.5"
+              className="flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2.5 text-[11px] font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 transition-transform hover:-translate-y-0.5"
             >
               <DollarSign className="w-4 h-4" /> Pay Monthly Fee (Razorpay)
             </button>
             <button
               onClick={() => setActiveTab('p_progress')}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-500/25 border border-emerald-400/30 flex items-center gap-1.5"
+              className="flex items-center gap-1.5 rounded-xl border border-emerald-400/30 bg-emerald-600 px-4 py-2.5 text-[11px] font-extrabold text-white shadow-lg shadow-emerald-500/25 transition-transform hover:-translate-y-0.5"
             >
               <Award className="w-4 h-4" /> View Test Marks Card
             </button>
@@ -70,68 +71,68 @@ export const ParentDashboard: React.FC<ParentDashboardProps> = ({ setActiveTab, 
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
           <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Child Attendance</span>
-            <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">96.5%</span>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">22 Present / 23 Days</span>
+            <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Child Attendance</span>
+            <span className="mt-2 block text-3xl font-black text-emerald-600 dark:text-emerald-400">96.5%</span>
+            <span className="mt-2 block text-[11px] text-slate-500 dark:text-slate-400">22 Present / 23 Days</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 flex items-center justify-center">
-            <UserCheck className="w-6 h-6" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+            <UserCheck className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
+        <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
           <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Average Test Score</span>
-            <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-300 mt-1 block">
+            <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Average Test Score</span>
+            <span className="mt-2 block text-3xl font-black text-indigo-600 dark:text-indigo-300">
               {averageScore ? `${averageScore}%` : 'N/A'}
             </span>
-            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-wider mt-1 inline-block bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+            <span className="mt-2 inline-block rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-emerald-700 dark:text-emerald-400">
               {childResults.length ? `${childResults.length} tests recorded` : 'No results available'}
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30 flex items-center justify-center">
-            <Award className="w-6 h-6" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
+            <Award className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
+        <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
           <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Current Fee Status</span>
-            <span className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">Paid</span>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">July 2026 Cleared</span>
+            <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Current Fee Status</span>
+            <span className="mt-2 block text-3xl font-black text-emerald-600 dark:text-emerald-400">Paid</span>
+            <span className="mt-2 block text-[11px] text-slate-500 dark:text-slate-400">July 2026 Cleared</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 flex items-center justify-center">
-            <CheckCircle2 className="w-6 h-6" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+            <CheckCircle2 className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl flex items-center justify-between">
+        <div className="flex min-h-[150px] items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
           <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Teacher Contact</span>
-            <span className="text-sm font-bold text-slate-900 dark:text-white mt-1 block">SSR Sir (Samba Siva Reddy Annem)</span>
-            <span className="text-[11px] text-amber-600 dark:text-amber-300 font-bold mt-1 block">+91 98765 43210</span>
+            <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Teacher Contact</span>
+            <span className="mt-2 block text-sm font-black text-slate-900 dark:text-white">SSR Sir (Samba Siva Reddy Annem)</span>
+            <span className="mt-2 block text-[11px] font-extrabold text-amber-600 dark:text-amber-300">+91 98765 43210</span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30 flex items-center justify-center">
-            <Phone className="w-6 h-6" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300">
+            <Phone className="h-6 w-6" />
           </div>
         </div>
       </div>
 
       {/* Teacher Note & Direct Line */}
-      <div className="bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl space-y-4">
-        <h3 className="text-base font-bold text-slate-900 dark:text-white">Recent Note from SSR Sir</h3>
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 space-y-2 backdrop-blur-md">
-          <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed italic">
+      <div className="rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_12px_30px_-16px_rgba(15,23,42,0.4)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/80">
+        <h3 className="text-base font-black text-slate-900 dark:text-white">Recent Note from SSR Sir</h3>
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5">
+          <p className="text-xs leading-relaxed text-slate-700 italic dark:text-slate-300">
             "Sai Karthik is performing exceptionally well in Mathematics quadratic proofs and Physics ray diagrams. His homework is submitted consistently on time. Please ensure he practices 3 board sample papers before next Sunday."
           </p>
-          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold block">— Samba Siva Reddy Annem (Head Teacher)</span>
+          <span className="mt-3 block text-[10px] font-extrabold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">— Samba Siva Reddy Annem (Head Teacher)</span>
         </div>
       </div>
       {/* Reviews Editor for parents */}
-      <div className="pt-6">
+      <div className="pt-2">
         <ReviewsEditor />
       </div>
     </div>

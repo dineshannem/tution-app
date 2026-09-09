@@ -134,7 +134,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
 
   return (
     <PageTransition>
-      <div className="space-y-20 pb-16">
+      <div className="public-page space-y-20 pb-16">
 
         {/* 1. Hero */}
         <section className="relative overflow-hidden bg-slate-950/70 text-white pt-12 pb-20 rounded-3xl mx-4 sm:mx-6 lg:mx-8 mt-4 shadow-2xl border border-white/10 backdrop-blur-2xl">
@@ -144,19 +144,14 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="lg:col-span-7 space-y-6 text-center lg:text-left"
             >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide shadow-sm"
-              >
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide shadow-sm">
                 <Sparkles className="w-4 h-4 text-amber-400" /> ADMISSIONS OPEN FOR ACADEMIC YEAR 2026-27
-              </motion.div>
+              </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
                 Empowering Students for Board Excellence in{' '}
@@ -172,8 +167,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
                 <motion.button
-                  whileHover={{ scale: 1.06, y: -15 }}
-                  whileTap={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={openFreeDemo}
                   className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-xl shadow-amber-500/25 flex items-center gap-2"
                 >
@@ -181,8 +176,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                 </motion.button>
 
                 <motion.button
-                  whileHover={{ scale: 1.06, y: -15 }}
-                  whileTap={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={openAdmission}
                   className="px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 border border-indigo-400/30 flex items-center gap-2"
                 >
@@ -196,29 +191,21 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                   { value: 'Max 15', label: 'Students Per Batch', color: 'text-indigo-300' },
                   { value: '98%', label: 'Board Pass Rate', color: 'text-emerald-400' }
                 ].map((stat, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 + i * 0.1 }}
-                  >
+                  <div key={i}>
                     <div className={`text-2xl font-black ${stat.color}`}>{stat.value}</div>
                     <div className="text-xs text-slate-400">{stat.label}</div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               className="lg:col-span-5 flex justify-center"
             >
-              <motion.div
-                whileHover={{ y: -20, scale: 1.02 }}
-                className="relative w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-6 shadow-2xl space-y-4"
-              >
+              <div className="relative w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div className="relative rounded-2xl overflow-hidden h-52">
                   <img
                     src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&auto=format&fit=crop&q=80"
@@ -237,19 +224,13 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     'Weekly Tests & Instant Parent WhatsApp Updates',
                     'Online Google Meet + Offline Classroom Batches'
                   ].map((text, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.8 + i * 0.08 }}
-                      className="flex items-center gap-2"
-                    >
+                    <div key={i} className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                       <span>{text}</span>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
           </div>
         </section>
@@ -283,9 +264,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
         {/* 2. Why Choose */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
             className="text-center space-y-3 max-w-3xl mx-auto"
           >
             <span className="text-xs font-bold text-amber-700 dark:text-amber-300 uppercase tracking-widest bg-amber-500/10 px-3.5 py-1 rounded-full border border-amber-500/20">
@@ -303,7 +285,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true, margin: "-40px" }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {[
@@ -315,7 +297,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
               <motion.div
                 key={i}
                 variants={listItem}
-                whileHover={{ y: -30, scale: 1.02 }}
+                whileHover={{ y: -6 }}
                 className={`bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl ${item.border} transition-all space-y-3 cursor-default`}
               >
                 <div className={`w-12 h-12 rounded-xl bg-${item.color}-500/20 text-${item.color}-600 dark:text-${item.color}-300 border border-${item.color}-500/30 flex items-center justify-center`}>
@@ -332,9 +314,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
         <section className="bg-slate-100/80 dark:bg-slate-950/40 py-16 border-y border-slate-200 dark:border-white/10 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
               className="text-center space-y-3 max-w-2xl mx-auto"
             >
               <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Subjects Taught (Classes 1–10)</h2>
@@ -354,7 +337,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                 <motion.div
                   key={i}
                   variants={listItem}
-                  whileHover={{ y: -20, scale: 1.02 }}
+                  whileHover={{ y: -6 }}
                   className={`bg-white dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl ${sub.hover} transition-all flex items-start gap-4 cursor-default`}
                 >
                   <div className="text-3xl p-3 bg-slate-100 dark:bg-white/10 rounded-2xl flex-shrink-0 border border-slate-200 dark:border-white/10">
@@ -373,10 +356,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
         {/* 4. Teaching Methodology */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -500 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
             className="space-y-6"
           >
             <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
@@ -395,13 +378,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                 { title: 'Offline & Online Google Meet Flexibility', desc: 'Attend in-person at our Hyderabad tuition center or join live Google Meet classes remotely.' },
                 { title: 'Curated PDF Notes & Formulas', desc: 'Handcrafted formula sheets, ray diagram guides, and previous 10-year board paper solutions.' }
               ].map((item, i) => (
-                <motion.div
+                <div
                   key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  whileHover={{ x: 6 }}
                   className="flex items-start gap-3 p-3.5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 backdrop-blur-xl shadow-md"
                 >
                   <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
@@ -409,17 +387,16 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white">{item.title}</h4>
                     <p className="text-xs text-slate-600 dark:text-slate-400">{item.desc}</p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 500 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/15 h-96"
           >
             <img
@@ -440,9 +417,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
         <section className="bg-slate-100/90 dark:bg-slate-950/60 text-slate-900 dark:text-white py-16 border-y border-slate-200 dark:border-white/10 backdrop-blur-xl">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
               className="text-center space-y-3 max-w-2xl mx-auto"
             >
               <span className="text-xs font-bold text-amber-700 dark:text-amber-300 uppercase tracking-widest">Proven Track Record</span>
@@ -465,7 +443,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                 <motion.div
                   key={i}
                   variants={listItem}
-                  whileHover={{ y: -20, scale: 1.02 }}
+                  whileHover={{ y: -6 }}
                   className={`bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 p-6 rounded-2xl space-y-4 backdrop-blur-xl shadow-xl ${item.border} transition-all cursor-default`}
                 >
                   <div className="flex items-center gap-1 text-amber-400">
@@ -490,9 +468,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
         {/* 6. FAQ */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
             className="text-center space-y-2"
           >
             <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-widest bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20">
@@ -505,10 +484,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
             {faqs.map((faq, idx) => (
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.08 }}
+                transition={{ delay: idx * 0.06 }}
                 className="bg-white dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-lg"
               >
                 <button
@@ -530,7 +509,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: 0.25 }}
                       className="overflow-hidden"
                     >
                       <div className="px-5 pb-5 pt-1 text-xs text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-white/10 leading-relaxed">
@@ -547,9 +526,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
         {/* 7. Contact */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           <motion.div
-            initial={{ opacity: 0, y: 300 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
             className="lg:col-span-6 bg-white dark:bg-slate-900/80 backdrop-blur-2xl p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl space-y-6"
           >
             <div>
@@ -592,8 +572,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
               <motion.button
                 type="submit"
                 disabled={submittingContact}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 border border-indigo-400/30 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 <Send className="w-4 h-4" />
@@ -603,16 +583,13 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 300 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             className="lg:col-span-6 space-y-6"
           >
-            <motion.div
-              whileHover={{ y: -10 }}
-              className="bg-white dark:bg-slate-900/80 backdrop-blur-2xl text-slate-900 dark:text-white p-8 rounded-3xl space-y-6 shadow-2xl border border-slate-200 dark:border-white/10"
-            >
+            <div className="bg-white dark:bg-slate-900/80 backdrop-blur-2xl text-slate-900 dark:text-white p-8 rounded-3xl space-y-6 shadow-2xl border border-slate-200 dark:border-white/10">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">Center Details & Working Hours</h3>
               <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300">
                 <div className="flex items-start gap-3">
@@ -637,18 +614,15 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              whileHover={{ y: -10 }}
-              className="rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-xl h-64 bg-slate-100 dark:bg-slate-900 relative flex items-center justify-center p-6 text-center"
-            >
+            <div className="rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-xl h-64 bg-slate-100 dark:bg-slate-900 relative flex items-center justify-center p-6 text-center">
               <div
                 className="absolute inset-0 bg-cover bg-center opacity-30"
                 style={{ backgroundImage: "url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&auto=format&fit=crop&q=80')" }}
               />
               <div className="relative z-10 space-y-3 bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/15 shadow-2xl">
-                <MapPin className="w-8 h-8 text-rose-500 mx-auto animate-bounce" />
+                <MapPin className="w-8 h-8 text-rose-500 mx-auto" />
                 <h4 className="text-sm font-bold text-slate-900 dark:text-white">SSR Tuition Hyderabad Center</h4>
                 <p className="text-xs text-slate-600 dark:text-slate-300">Convenient location with safe environment & parking.</p>
                 <a
@@ -660,10 +634,10 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                   Open Google Maps Navigation
                 </a>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </section>
-  </div>
+      </div>
     </PageTransition>
   );
 };

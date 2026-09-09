@@ -12,7 +12,7 @@ interface PublicAboutProps {
 export const PublicAbout: React.FC<PublicAboutProps> = ({ openFreeDemo, openAdmission }) => {
   return (
     <PageTransition>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+      <div className="public-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -52,14 +52,14 @@ export const PublicAbout: React.FC<PublicAboutProps> = ({ openFreeDemo, openAdmi
 
           <div className="grid grid-cols-2 gap-4 pt-2">
   <motion.div
-    whileHover={{ y: -20 }}
+    whileHover={{ y: -4 }}
     className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
   >
     <div className="text-2xl font-black text-amber-500">1,500+</div>
     <div className="text-xs text-slate-500">Students Guided</div>
   </motion.div>
   <motion.div
-    whileHover={{ y: -20 }}
+    whileHover={{ y: -4 }}
     className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
   >
     <div className="text-2xl font-black text-blue-500">98.4%</div>
@@ -94,7 +94,7 @@ export const PublicAbout: React.FC<PublicAboutProps> = ({ openFreeDemo, openAdmi
       <motion.div
         key={i}
         variants={listItem}
-        whileHover={{ y: -20 }}
+        whileHover={{ y: -4 }}
         className="bg-slate-50 dark:bg-slate-800/70 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3"
       >
         <Icon className={`w-8 h-8 text-${item.color}-600 dark:text-${item.color}-400`} />

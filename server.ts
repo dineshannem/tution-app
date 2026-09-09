@@ -755,7 +755,11 @@ app.get("/api/health", (req, res) => {
 
 // Students
 app.get("/api/students", (req, res) => {
-  res.json(db.students);
+  const { batchId, class: studentClass } = req.query;
+  let list = db.students;
+  if (batchId) list = list.filter(student => student.batchId === batchId);
+  if (studentClass) list = list.filter(student => student.class === studentClass);
+  res.json(list);
 });
 
 app.post("/api/students", (req, res) => {
@@ -860,6 +864,20 @@ app.post("/api/batches", (req, res) => {
   };
   db.batches.push(newBatch);
   res.json({ success: true, batch: newBatch });
+});
+
+app.patch("/api/batches/:id", (req, res) => {
+  const batch = db.batches.find(item => item.id === req.params.id);
+  if (!batch) return res.status(404).json({ success: false, error: "Batch not found." });
+  Object.assign(batch, req.body, { id: batch.id, currentCount: batch.currentCount || 0 });
+  db.students.forEach(student => {
+    if (student.batchId === batch.id) {
+      student.batchName = batch.name;
+      student.class = batch.class;
+      student.board = batch.board;
+    }
+  });
+  res.json({ success: true, batch });
 });
 
 // Attendance
@@ -1187,7 +1205,14 @@ app.post("/api/fees/pay", (req, res) => {
 
 // Notifications
 app.get("/api/notifications", (req, res) => {
-  res.json(db.notifications);
+  const today = new Date().toISOString().split('T')[0];
+  const { role, studentId } = req.query;
+  res.json(db.notifications.filter(notification => {
+    const createdDate = notification.createdAt.split(' ')[0];
+    const roleMatches = !role || notification.targetRole === 'all' || notification.targetRole === role;
+    const studentMatches = !studentId || !notification.targetStudentId || notification.targetStudentId === studentId;
+    return createdDate >= today && roleMatches && studentMatches;
+  }));
 });
 
 app.delete("/api/notifications/:id", (req, res) => {
@@ -1197,8 +1222,7 @@ app.delete("/api/notifications/:id", (req, res) => {
 });
 
 app.post("/api/notifications/clear-all", (req, res) => {
-  db.notifications = [];
-  res.json({ success: true, notifications: [] });
+  res.json({ success: true, notifications: db.notifications });
 });
 
 // Gallery & Testimonials
@@ -1231,6 +1255,12 @@ app.post("/api/demo-registration", (req, res) => {
     ...req.body
   };
   db.demoRegistrations.unshift(demo);
+  addNotification({
+    title: 'New Free Demo Request',
+    message: `${demo.parentName} booked a demo for ${demo.studentName} (${demo.class}, ${demo.board}). Contact: ${demo.phone}.`,
+    type: 'demo',
+    targetRole: 'teacher'
+  });
   res.json({ success: true, message: "Free Demo request received! SSR Sir will contact you shortly.", demo });
 });
 
@@ -1242,6 +1272,12 @@ app.post("/api/admission", (req, res) => {
     ...req.body
   };
   db.admissionRequests.unshift(adm);
+  addNotification({
+    title: 'New Online Admission Application',
+    message: `${adm.parentName} applied for ${adm.studentName} (${adm.class}, ${adm.board}). Contact: ${adm.phone}.`,
+    type: 'admission',
+    targetRole: 'teacher'
+  });
   res.json({ success: true, message: "Online Admission application submitted successfully!", admission: adm });
 });
 
@@ -1252,6 +1288,12 @@ app.post("/api/contact", (req, res) => {
     ...req.body
   };
   db.enquiries.unshift(enq);
+  addNotification({
+    title: 'New Public Enquiry',
+    message: `${enq.name} sent an enquiry${enq.subject ? ` about ${enq.subject}` : ''}. Contact: ${enq.phone}.`,
+    type: 'enquiry',
+    targetRole: 'teacher'
+  });
   res.json({ success: true, message: "Thank you for contacting SSR Tuition! We will get back to you soon.", enquiry: enq });
 });
 
@@ -1280,6 +1322,14 @@ function initializeCredentialsAndStudents() {
     }
   ];
 
+  for (let classNumber = 1; classNumber <= 10; classNumber++) {
+    const className = `Class ${classNumber}`;
+    const batchId = `b_cbse_${classNumber}`;
+    if (!db.batches.some(batch => batch.id === batchId)) {
+      db.batches.push({ id: batchId, name: `${className} CBSE - Foundation Batch`, class: className, board: 'CBSE', subject: 'Mathematics & Science', schedule: 'Mon, Wed, Fri', time: '04:00 PM - 05:30 PM', maxStudents: 15, currentCount: 0 });
+    }
+  }
+
   // Generate 50 Students and 50 Parents with valid credentials (min 10 characters for username & password)
   for (let i = 1; i <= 50; i++) {
     const sIdxStr = String(i).padStart(2, '0');
@@ -1287,7 +1337,7 @@ function initializeCredentialsAndStudents() {
     const pId = `p${1000 + i}`;
     const rollNo = `${1000 + i}`;
     const board = boards[(i - 1) % boards.length];
-    const sClass = `Class ${6 + ((i - 1) % 5)}`;
+    const sClass = `Class ${1 + ((i - 1) % 10)}`;
     
     // Student and Parent credentials between 8 and 10 characters
     const studentUsername = `student${sIdxStr}`;  // e.g. student01 (9 chars)
@@ -1305,7 +1355,7 @@ function initializeCredentialsAndStudents() {
       rollNo,
       class: sClass,
       board,
-      batchId: `b_${board.toLowerCase().replace(/\s+/g, '_')}_${sClass.replace(/\s+/g, '').toLowerCase()}`,
+      batchId: `b_cbse_${sClass.replace(/\s+/g, '').toLowerCase().replace('class', '')}`,
       batchName: `${sClass} ${board} - Comprehensive`,
       email: `${studentUsername}@ssrtuition.com`,
       phone: `+91 98${String(1000000 + i * 333).substring(0, 8)}`,
@@ -1447,9 +1497,113 @@ function convertAdmissionToStudent(admission: any) {
   return newStudent;
 }
 
+const captchaStore = new Map<string, { answer: string; expiresAt: number }>();
+const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+const captchaFailures = new Map<string, { count: number; resetAt: number }>();
+
+function getSecurityKey(req: express.Request, username?: unknown, email?: unknown, role?: unknown) {
+  const identity = String(username || email || 'anonymous').trim().toLowerCase();
+  const portal = String(role || 'portal').trim().toLowerCase();
+  return `${req.ip || 'unknown'}:${portal}:${identity}`;
+}
+
+function getCaptchaLockout(key: string) {
+  const failure = captchaFailures.get(key);
+  if (!failure) return null;
+  if (Date.now() >= failure.resetAt) {
+    captchaFailures.delete(key);
+    return null;
+  }
+  return failure.count >= 5 ? failure : null;
+}
+
+function registerCaptchaFailure(key: string) {
+  const current = captchaFailures.get(key);
+  const withinWindow = current && Date.now() < current.resetAt;
+  const failure = {
+    count: withinWindow ? current.count + 1 : 1,
+    resetAt: withinWindow ? current.resetAt : Date.now() + 5 * 60 * 1000
+  };
+  captchaFailures.set(key, failure);
+  return failure;
+}
+
+function addNotification(notification: Omit<NotificationItem, 'id' | 'createdAt' | 'readBy'>) {
+  db.notifications.unshift({
+    ...notification,
+    id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+    readBy: []
+  });
+}
+
+app.get("/api/auth/captcha", (req, res) => {
+  const token = `captcha_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  const a = Math.floor(Math.random() * 8) + 2;
+  const b = Math.floor(Math.random() * 9) + 1;
+  const answer = String(a + b);
+  captchaStore.set(token, { answer, expiresAt: Date.now() + 5 * 60 * 1000 });
+
+  res.json({
+    token,
+    prompt: `Solve the security check: ${a} + ${b} = ?`
+  });
+});
+
+app.post("/api/auth/verify-captcha", (req, res) => {
+  const { token, answer } = req.body || {};
+  const securityKey = getSecurityKey(req);
+  const lockout = getCaptchaLockout(securityKey);
+  if (lockout) {
+    const remainingMinutes = Math.max(1, Math.ceil((lockout.resetAt - Date.now()) / 60000));
+    return res.status(429).json({ valid: false, error: `Security check locked after 5 failed attempts. Try again in ${remainingMinutes} minute(s).` });
+  }
+  const record = token ? captchaStore.get(String(token)) : undefined;
+
+  if (!record || !answer || Date.now() > record.expiresAt) {
+    captchaStore.delete(String(token));
+    const failure = registerCaptchaFailure(securityKey);
+    if (failure.count >= 5) {
+      return res.status(429).json({ valid: false, error: 'Security check locked after 5 failed attempts. Try again in 5 minutes.' });
+    }
+    return res.status(400).json({ valid: false, error: 'Security check expired or invalid.' });
+  }
+
+  const isValid = String(answer).trim() === record.answer;
+  if (isValid) {
+    captchaStore.delete(String(token));
+    captchaFailures.delete(securityKey);
+    return res.json({ valid: true });
+  }
+
+  captchaStore.delete(String(token));
+  const failure = registerCaptchaFailure(securityKey);
+  if (failure.count >= 5) {
+    return res.status(429).json({ valid: false, error: 'Security check locked after 5 failed attempts. Try again in 5 minutes.' });
+  }
+  return res.status(400).json({ valid: false, error: 'Incorrect security answer. Please try again.' });
+});
+
 // Auth & Credentials API Endpoints
 app.post("/api/auth/login", (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { username, email, password, role, captchaToken, captchaAnswer } = req.body;
+  const attemptKey = getSecurityKey(req, username, email, role);
+  const attempt = loginAttempts.get(attemptKey);
+  if (attempt && Date.now() < attempt.resetAt && attempt.count >= 5) {
+    return res.status(429).json({
+      error: 'Login locked after 5 failed attempts.',
+      retryAfterMs: Math.max(0, attempt.resetAt - Date.now()),
+      attemptsRemaining: 0
+    });
+  }
+  const captchaFailure = getCaptchaLockout(attemptKey);
+  if (captchaFailure) {
+    return res.status(429).json({
+      error: 'Security check locked after 5 failed attempts.',
+      retryAfterMs: Math.max(0, captchaFailure.resetAt - Date.now()),
+      attemptsRemaining: 0
+    });
+  }
   const inputStr = (username || email || "").trim().toLowerCase();
   const pwdStr = (password || "").trim();
 
@@ -1482,7 +1636,37 @@ app.post("/api/auth/login", (req, res) => {
     return userMatch && roleMatch && pwdMatch;
   });
 
+  const tokenRecord = captchaToken ? captchaStore.get(String(captchaToken)) : undefined;
+  const isValidCaptcha = Boolean(
+    captchaToken && captchaAnswer && tokenRecord &&
+    String(captchaAnswer).trim() === tokenRecord.answer &&
+    Date.now() <= tokenRecord.expiresAt
+  );
+
+  if (!isValidCaptcha) {
+    captchaStore.delete(String(captchaToken));
+    const failure = registerCaptchaFailure(attemptKey);
+    if (failure.count >= 5) {
+      return res.status(429).json({
+        error: match
+          ? 'Security check locked after 5 failed attempts.'
+          : 'Invalid username or password, and the security check failed.',
+        retryAfterMs: Math.max(0, failure.resetAt - Date.now()),
+        attemptsRemaining: 0
+      });
+    }
+    return res.status(400).json({
+      error: match
+        ? 'Security check failed. Please complete the security check again.'
+        : 'Invalid username or password, and the security check failed.',
+      attemptsRemaining: 5 - failure.count
+    });
+  }
+  captchaStore.delete(String(captchaToken));
+
   if (match) {
+    loginAttempts.delete(attemptKey);
+    captchaFailures.delete(attemptKey);
     let userObj: any = {
       id: match.id,
       name: match.name,
@@ -1502,7 +1686,23 @@ app.post("/api/auth/login", (req, res) => {
 
     res.json({ success: true, user: userObj });
   } else {
-    res.status(401).json({ error: "Invalid username, password or portal role. Check credentials.txt or ask SSR Sir." });
+    const currentAttempt = loginAttempts.get(attemptKey);
+    const nextAttempt = {
+      count: currentAttempt && Date.now() < currentAttempt.resetAt ? currentAttempt.count + 1 : 1,
+      resetAt: currentAttempt && Date.now() < currentAttempt.resetAt ? currentAttempt.resetAt : Date.now() + 5 * 60 * 1000
+    };
+    loginAttempts.set(attemptKey, nextAttempt);
+    if (nextAttempt.count >= 5) {
+      return res.status(429).json({
+        error: 'Login locked after 5 failed attempts.',
+        retryAfterMs: Math.max(0, nextAttempt.resetAt - Date.now()),
+        attemptsRemaining: 0
+      });
+    }
+    res.status(401).json({
+      error: "Invalid username, password or portal role. Check credentials.txt or ask SSR Sir.",
+      attemptsRemaining: 5 - nextAttempt.count
+    });
   }
 });
 
@@ -1528,16 +1728,6 @@ app.post("/api/credentials/update", (req, res) => {
 });
 
 app.get("/api/credentials/file", (req, res) => {
-  const filePath = path.join(process.cwd(), 'credentials.txt');
-  if (fs.existsSync(filePath)) {
-    res.setHeader('Content-Type', 'text/plain');
-    res.sendFile(filePath);
-  } else {
-    res.status(404).send("credentials.txt file not found");
-  }
-});
-
-app.get("/credentials.txt", (req, res) => {
   const filePath = path.join(process.cwd(), 'credentials.txt');
   if (fs.existsSync(filePath)) {
     res.setHeader('Content-Type', 'text/plain');

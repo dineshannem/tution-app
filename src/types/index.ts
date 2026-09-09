@@ -117,6 +117,8 @@ export interface StudyMaterial {
   videoUrl?: string;
   fileName?: string;
   fileSize?: string;
+  description?: string;
+  extraInfo?: string;
   uploadedAt: string;
 }
 
@@ -130,6 +132,7 @@ export interface OnlineClass {
   date: string;
   startTime: string;
   endTime: string;
+  platform?: 'Google Meet' | 'Zoom';
   meetLink: string;
   recordedVideoUrl?: string;
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';

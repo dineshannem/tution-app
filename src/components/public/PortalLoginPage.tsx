@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { useAuth } from '../../context/AuthContext';
 import { UserRole } from '../../types';
@@ -10,7 +10,6 @@ import {
   Lock,
   ArrowRight,
   AlertCircle,
-  FileText,
   Eye,
   EyeOff,
   Sparkles,
@@ -46,19 +45,68 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showPlainCreds, setShowPlainCreds] = useState(false);
+  const [captcha, setCaptcha] = useState<{ token: string; prompt: string } | null>(null);
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [captchaAttemptsRemaining, setCaptchaAttemptsRemaining] = useState<number | null>(null);
+  const [captchaLockedUntil, setCaptchaLockedUntil] = useState<number | null>(null);
+  const [captchaSecondsRemaining, setCaptchaSecondsRemaining] = useState(0);
 
-  const handleQuickFill = (u: string, p: string, r: UserRole) => {
-    setRole(r);
-    setUsername(u);
-    setPassword(p);
-    setError(null);
+  const refreshCaptcha = async () => {
+    try {
+      const res = await fetch('/api/auth/captcha');
+      const data = await res.json();
+      if (res.ok && data?.token && data?.prompt) {
+        setCaptcha(data);
+        setCaptchaAnswer('');
+      }
+    } catch (err) {
+      console.error('Captcha load failed', err);
+    }
   };
+
+  useEffect(() => {
+    refreshCaptcha();
+    setCaptchaAttemptsRemaining(null);
+    setCaptchaLockedUntil(null);
+    setCaptchaSecondsRemaining(0);
+    setError(null);
+  }, [role]);
+
+  useEffect(() => {
+    if (!captchaLockedUntil) return;
+    const updateCountdown = () => {
+      const seconds = Math.max(0, Math.ceil((captchaLockedUntil - Date.now()) / 1000));
+      setCaptchaSecondsRemaining(seconds);
+      if (seconds === 0) {
+        setCaptchaLockedUntil(null);
+        setCaptchaAttemptsRemaining(null);
+        setError(null);
+        setActiveTab('home');
+      }
+    };
+    updateCountdown();
+    const timer = window.setInterval(updateCountdown, 1000);
+    return () => window.clearInterval(timer);
+  }, [captchaLockedUntil]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (captchaLockedUntil && Date.now() < captchaLockedUntil) {
+      return;
+    }
     if (!username.trim() || !password.trim()) {
       setError('Please enter both username and password.');
+      return;
+    }
+
+    if (!captcha || !captcha.token) {
+      setError('Security check is unavailable. Please refresh and try again.');
+      await refreshCaptcha();
+      return;
+    }
+
+    if (!captchaAnswer.trim()) {
+      setError('Please complete the security check before logging in.');
       return;
     }
 
@@ -70,7 +118,7 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
     setLoading(true);
     setError(null);
 
-    const result = await login(username.trim(), password.trim(), role);
+    const result = await login(username.trim(), password.trim(), role, captcha.token, captchaAnswer.trim());
     setLoading(false);
 
     if (result.success) {
@@ -81,8 +129,18 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
       else if (role === 'parent') setActiveTab('p_dashboard');
     } else {
       setError(result.message || 'Invalid username or password. Please check credentials.');
+      if (typeof result.attemptsRemaining === 'number') {
+        setCaptchaAttemptsRemaining(result.attemptsRemaining);
+      }
+      if (result.retryAfterMs) {
+        setCaptchaLockedUntil(Date.now() + result.retryAfterMs);
+      } else {
+        await refreshCaptcha();
+      }
     }
   };
+
+  const lockoutTime = `${Math.floor(captchaSecondsRemaining / 60)}:${String(captchaSecondsRemaining % 60).padStart(2, '0')}`;
 
   const portalConfig = {
     teacher: {
@@ -100,7 +158,7 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
         'Complete control over 50 Students & Parents',
         'Direct username & password reset generator',
         'Real-time attendance & exam marks entry for all students',
-        'Automatic credentials.txt file synchronization'
+        'Secure attendance, fee, and academic management tools'
       ]
     },
     student: {
@@ -146,7 +204,23 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
 
   return (
     <PageTransition>
-      <div className="space-y-8 animate-fade-in max-w-5xl mx-auto py-4">
+      <div className="public-page space-y-8 animate-fade-in max-w-5xl mx-auto py-4">
+        {captchaLockedUntil && (
+          <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm" role="alertdialog" aria-modal="true" aria-label="Login temporarily locked">
+            <div className="w-full max-w-md rounded-3xl border border-rose-200 bg-white p-6 text-center shadow-2xl dark:border-rose-900 dark:bg-slate-900">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-300">
+                <Shield className="h-7 w-7" />
+              </div>
+              <h2 className="mt-4 text-xl font-black text-slate-900 dark:text-white">{role.toUpperCase()} login temporarily blocked</h2>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Five unsuccessful security or login attempts were detected for this portal. You can try again after:</p>
+              <p className="mt-4 font-mono text-4xl font-black tabular-nums text-rose-600 dark:text-rose-300">{lockoutTime}</p>
+              <p className="mt-2 text-xs font-semibold text-slate-500 dark:text-slate-400">The timer will unlock this {role} portal automatically.</p>
+              <button type="button" onClick={() => setActiveTab('home')} className="mt-5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-extrabold text-white transition hover:bg-slate-700 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
+                Return to Public Page
+              </button>
+            </div>
+          </div>
+        )}
         
         {/* Top Banner & Title */}
         <motion.div
@@ -237,7 +311,7 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
                   Login to {currentConfig.name}
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Enter your credentials (as stored in credentials.txt)
+                  Enter your portal credentials
                 </p>
               </div>
             </div>
@@ -300,12 +374,38 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
               </p>
             </div>
 
+            <div className={`rounded-2xl border p-3 ${captchaLockedUntil ? 'border-rose-300 bg-rose-50 dark:border-rose-800 dark:bg-rose-950/40' : 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950/70'}`}>
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Security check</p>
+                  <p className={`text-sm font-semibold ${captchaLockedUntil ? 'text-rose-700 dark:text-rose-300' : 'text-slate-800 dark:text-slate-200'}`}>
+                    {captchaLockedUntil ? `Login blocked. Try again in ${lockoutTime}` : captcha?.prompt || 'Loading challenge...'}
+                  </p>
+                </div>
+                <button type="button" disabled={!!captchaLockedUntil} onClick={refreshCaptcha} className="text-[10px] font-bold text-indigo-600 hover:underline disabled:cursor-not-allowed disabled:opacity-40 dark:text-indigo-400">
+                  Refresh
+                </button>
+              </div>
+              {captchaAttemptsRemaining !== null && !captchaLockedUntil && (
+                <p className="mt-2 text-[11px] font-bold text-amber-700 dark:text-amber-300">Warning: {captchaAttemptsRemaining} security attempt{captchaAttemptsRemaining === 1 ? '' : 's'} remaining before a 5-minute lockout.</p>
+              )}
+              <input
+                type="number"
+                inputMode="numeric"
+                value={captchaAnswer}
+                onChange={(e) => setCaptchaAnswer(e.target.value)}
+                placeholder="Enter the answer"
+                disabled={!!captchaLockedUntil}
+                className="mt-3 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !!captchaLockedUntil}
               className={`w-full py-3.5 px-6 rounded-2xl text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl transition-all disabled:opacity-50 ${currentConfig.btnBg}`}
             >
-              {loading ? 'Authenticating Credentials...' : `Login to ${currentConfig.name}`}
+              {captchaLockedUntil ? `Locked for ${lockoutTime}` : loading ? 'Authenticating Credentials...' : `Login to ${currentConfig.name}`}
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
@@ -356,80 +456,8 @@ export const PortalLoginPage: React.FC<PortalLoginPageProps> = ({
             </div>
           </div>
 
-          {/* Plain Text File Access & Quick Fill Helper */}
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
-            <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
-                <FileText className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>credentials.txt File Storage</span>
-              </div>
-              <a
-                href="/credentials.txt"
-                target="_blank"
-                rel="noreferrer"
-                className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-[11px] rounded-xl transition-all shadow-sm flex items-center gap-1"
-              >
-                Open Plain Text File
-              </a>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                <KeyRound className="w-4 h-4 text-indigo-500" /> Sample Accounts Quick Fill
-              </span>
-              <button
-                type="button"
-                onClick={() => setShowPlainCreds(!showPlainCreds)}
-                className="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline"
-              >
-                {showPlainCreds ? 'Hide Sample Accounts' : 'View Sample Accounts'}
-              </button>
-            </div>
-
-            {showPlainCreds && (
-              <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs space-y-2 animate-fade-in">
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Click any account to auto-fill the form:
-                </p>
-                <div className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('Dinesh_A', 'Dinesh@1', 'teacher')}
-                    className="w-full p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/80 text-left hover:border-amber-400 transition-all flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-bold text-amber-900 dark:text-amber-300 text-xs">Teacher: Dinesh_A</div>
-                      <div className="font-mono text-[10px] text-slate-600 dark:text-slate-400">Dinesh_A / Dinesh@1</div>
-                    </div>
-                    <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-200/50 dark:bg-amber-900/50 px-2 py-0.5 rounded">Fill</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('student01', 'stdpass01', 'student')}
-                    className="w-full p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/80 text-left hover:border-indigo-400 transition-all flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-bold text-indigo-900 dark:text-indigo-300 text-xs">Student: student01</div>
-                      <div className="font-mono text-[10px] text-slate-600 dark:text-slate-400">student01 / stdpass01</div>
-                    </div>
-                    <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-200/50 dark:bg-indigo-900/50 px-2 py-0.5 rounded">Fill</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill('parent_01', 'prnpass01', 'parent')}
-                    className="w-full p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800/80 text-left hover:border-purple-400 transition-all flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-bold text-purple-900 dark:text-purple-300 text-xs">Parent: parent_01</div>
-                      <div className="font-mono text-[10px] text-slate-600 dark:text-slate-400">parent_01 / prnpass01</div>
-                    </div>
-                    <span className="text-[10px] font-bold text-purple-700 dark:text-purple-400 bg-purple-200/50 dark:bg-purple-900/50 px-2 py-0.5 rounded">Fill</span>
-                  </button>
-                </div>
-              </div>
-            )}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+            <p className="text-xs text-slate-500 dark:text-slate-400">Contact the tuition administrator to receive your secure portal credentials.</p>
           </div>
 
         </div>

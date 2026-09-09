@@ -110,7 +110,7 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg overflow-hidden transition-all">
+      <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl transition-all dark:border-slate-800 dark:bg-slate-900">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-800 p-6 text-white relative">
           <div className="flex items-center justify-between">
@@ -140,14 +140,14 @@ export const RazorpayModal: React.FC<RazorpayModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="min-h-0 overflow-y-auto p-4 sm:p-6">
           {!completed ? (
             <form onSubmit={handlePayNow}>
               <div className="mb-5">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
                   Select Payment Method
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <button
                     type="button"
                     onClick={() => setMethod('UPI')}

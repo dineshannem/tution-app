@@ -7,11 +7,8 @@ import { AvatarPickerModal } from '../common/AvatarPickerModal';
 import {
   GraduationCap,
   Bell,
-  Sun,
   SunMedium,
-  Moon,
   MoonStar,
-  Monitor,
   Laptop,
   Check,
   LogOut,
@@ -26,7 +23,6 @@ import {
   ChevronRight,
   KeyRound,
   LogIn,
-  ShieldAlert,
   BookOpen,
   Award,
   Video,
@@ -34,8 +30,6 @@ import {
   CreditCard,
   Image,
   FileText,
-  ArrowRight,
-  SlidersHorizontal
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -79,15 +73,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   }, [mobileMenuOpen]);
 
-  // Auto-close notifications dropdown after 3 seconds
-  useEffect(() => {
-    if (!showNotifications) return;
-    const timer = setTimeout(() => {
-      setShowNotifications(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [showNotifications]);
-
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -104,11 +89,26 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   useEffect(() => {
-    fetch('/api/notifications')
-      .then(r => r.json())
-      .then(data => setNotifications(data))
-      .catch(err => console.error(err));
-  }, []);
+    const loadNotifications = () => {
+      fetch(`/api/notifications?role=${user?.role || ''}&studentId=${user?.studentId || ''}`)
+        .then(r => r.json())
+        .then(data => {
+          const visible = user?.role === 'teacher'
+            ? data.filter((notification: any) => notification.targetRole === 'teacher' || notification.targetRole === 'all')
+            : data.filter((notification: any) => notification.targetRole === user?.role || notification.targetRole === 'all');
+          const dismissed = JSON.parse(localStorage.getItem(`ssr_dismissed_notifications_${user?.role}`) || '[]');
+          setNotifications(visible.filter((notification: any) => !dismissed.includes(notification.id)));
+        })
+        .catch(err => console.error(err));
+    };
+
+    if (user) {
+      loadNotifications();
+      const timer = window.setInterval(loadNotifications, 15000);
+      return () => window.clearInterval(timer);
+    }
+    setNotifications([]);
+  }, [user]);
 
   const handleScrollCheck = () => {
     if (!navScrollRef.current) return;
@@ -212,7 +212,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       handleTabChange(targetTab);
     } else {
       if (user) {
-        logout(); // Force immediate logout when switching to a different portal
+        logout();
       }
       switchRole(targetRole);
       if (targetRole === 'teacher') handleTabChange('teacher_login');
@@ -223,14 +223,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const handleDismissNotification = (id: string) => {
-    // Optimistic removal so item exits immediately with smooth slide & blur animation
     setNotifications(prev => prev.filter(n => n.id !== id));
-    fetch(`/api/notifications/${id}`, { method: 'DELETE' })
-      .then(r => r.json())
-      .then(data => {
-        if (data.notifications) setNotifications(data.notifications);
-      })
-      .catch(err => console.error(err));
+    const key = `ssr_dismissed_notifications_${user?.role}`;
+    const dismissed = JSON.parse(localStorage.getItem(key) || '[]');
+    localStorage.setItem(key, JSON.stringify([...new Set([...dismissed, id])]));
   };
 
   const handleAvatarSave = (avatarUrl: string) => {
@@ -240,28 +236,23 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const handleClearAllNotifications = () => {
-    // Optimistic clear so all items exit fluidly
+    const key = `ssr_dismissed_notifications_${user?.role}`;
+    localStorage.setItem(key, JSON.stringify(notifications.map(notification => notification.id)));
     setNotifications([]);
-    fetch('/api/notifications/clear-all', { method: 'POST' })
-      .then(r => r.json())
-      .then(data => {
-        if (data.notifications) setNotifications(data.notifications);
-      })
-      .catch(err => console.error(err));
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/90 backdrop-blur-2xl border-b border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100 transition-colors shadow-sm w-full max-w-full overflow-x-clip">
+    <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-slate-100 transition-colors shadow-sm w-full max-w-full overflow-x-clip">
       
-      {/* Role Switcher Top Bar (Clean & Compact) */}
-      <div className="bg-slate-900 text-slate-200 text-xs py-1.5 px-3 sm:px-4 relative border-b border-slate-800 backdrop-blur-md w-full max-w-full min-w-0">
+      {/* Role Switcher Top Bar */}
+      <div className="bg-slate-900 dark:bg-slate-950 text-slate-200 text-xs py-1.5 px-3 sm:px-4 relative border-b border-slate-800/80 dark:border-white/5 backdrop-blur-md w-full max-w-full min-w-0">
         <div className="absolute inset-x-0 flex items-center justify-center pointer-events-none overflow-hidden">
           <div className="flex items-center gap-3 min-w-0 whitespace-nowrap text-center">
             <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shrink-0">
               SSR Portal Hub
             </span>
-            <span className="text-slate-300 text-[11px] truncate max-w-full">
-              Switch role to test portals or view public site:
+            <span className="text-slate-400 text-[11px] truncate max-w-full hidden sm:inline">
+              Switch role to test portals or view public site
             </span>
           </div>
         </div>
@@ -271,8 +262,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handlePortalSwitch('guest', 'home')}
             className={`rounded-lg transition-all whitespace-nowrap ${
               role === 'guest'
-                ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-indigo-600 text-white shadow-md shadow-indigo-500/30 border border-indigo-400/40'
-                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-300 hover:text-white bg-white/10 hover:bg-white/20'
+                ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-indigo-600 text-white shadow-md shadow-indigo-500/25 border border-indigo-400/40'
+                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
             }`}
           >
             Public Site
@@ -281,8 +272,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handlePortalSwitch('teacher', 't_dashboard')}
             className={`rounded-lg transition-all whitespace-nowrap ${
               role === 'teacher'
-                ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30 border border-amber-300'
-                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-300 hover:text-white bg-white/10 hover:bg-white/20'
+                ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-amber-500 text-slate-950 shadow-md shadow-amber-500/25 border border-amber-300/60'
+                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
             }`}
           >
             Teacher Control
@@ -291,8 +282,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handlePortalSwitch('student', 's_dashboard')}
             className={`rounded-lg transition-all whitespace-nowrap ${
               role === 'student'
-                ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30 border border-emerald-300'
-                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-300 hover:text-white bg-white/10 hover:bg-white/20'
+                ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25 border border-emerald-300/60'
+                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
             }`}
           >
             Student Portal
@@ -301,8 +292,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => handlePortalSwitch('parent', 'p_dashboard')}
             className={`rounded-lg transition-all whitespace-nowrap ${
               role === 'parent'
-                ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-purple-500 text-white shadow-md shadow-purple-500/30 border border-purple-300'
-                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-300 hover:text-white bg-white/10 hover:bg-white/20'
+                ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-purple-500 text-white shadow-md shadow-purple-500/25 border border-purple-300/50'
+                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
             }`}
           >
             Parent Portal
@@ -314,13 +305,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-w-0">
         <div className="grid grid-cols-3 items-center h-16 gap-2 sm:gap-4 min-w-0">
           <div />
+          
           {/* Center Branding */}
           <div className="flex items-center justify-center gap-2 sm:gap-3 shrink min-w-0 overflow-hidden">
             <div
               onClick={() => setActiveTab(role === 'guest' ? 'home' : `${role.charAt(0)}_dashboard`)}
               className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group min-w-0"
             >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform border border-white/30 shrink-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform border border-white/20 shrink-0">
                 <GraduationCap className="w-5 h-5" />
               </div>
               <div className="min-w-0 overflow-hidden text-center">
@@ -328,7 +320,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span className="text-sm sm:text-base lg:text-lg font-black tracking-tight text-slate-900 dark:text-white truncate">
                     SSR TUITION
                   </span>
-                  <span className="text-[9px] sm:text-[10px] font-extrabold uppercase px-1.5 py-0.5 bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 rounded-md hidden xs:inline-block shrink-0">
+                  <span className="text-[9px] sm:text-[10px] font-extrabold uppercase px-1.5 py-0.5 bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-500/30 rounded-md hidden xs:inline-block shrink-0">
                     Classes 1-10
                   </span>
                 </div>
@@ -339,53 +331,39 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Action Controls: Notifications, Theme Mode Toggle, Login/Logout, Hamburger */}
+          {/* Action Controls */}
           <div className="flex items-center justify-end gap-2 shrink-0">
             {role === 'guest' && (
               <div className="hidden lg:flex items-center gap-2">
                 <button
                   onClick={openFreeDemo}
-                  className="px-3 py-1.5 rounded-xl text-xs font-extrabold text-amber-900 bg-amber-100 border border-amber-300 hover:bg-amber-200 dark:text-amber-300 dark:bg-amber-500/20 dark:border-amber-500/30 transition-all flex items-center gap-1.5 shadow-sm"
+                  className="px-3 py-1.5 rounded-xl text-xs font-extrabold text-amber-900 bg-amber-50 border border-amber-200 hover:bg-amber-100 dark:text-amber-200 dark:bg-amber-500/15 dark:border-amber-500/25 transition-all flex items-center gap-1.5 shadow-sm"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" /> Free Demo
                 </button>
                 <button
                   onClick={openAdmission}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 border border-indigo-500 shadow-md transition-all"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 border border-indigo-500/50 shadow-md shadow-indigo-500/20 transition-all"
                 >
                   Apply Admission
                 </button>
               </div>
             )}
 
-            {/* Notifications Dropdown */}
+            {/* Notifications */}
             {role !== 'guest' && user && (
               <div className="relative notification-dropdown-container">
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="p-2 sm:p-2.5 rounded-2xl text-slate-800 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 transition-all relative active:scale-95"
+                  className="p-2 sm:p-2.5 rounded-2xl text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/10 border border-slate-200/80 dark:border-white/10 transition-all relative active:scale-95"
                   title="View alerts & notifications"
                 >
-                  <motion.div
-                    animate={
-                      notifications.length > 0
-                        ? { rotate: [0, -18, 18, -12, 12, -6, 6, 0] }
-                        : { rotate: 0 }
-                    }
-                    transition={{
-                      repeat: notifications.length > 0 ? Infinity : 0,
-                      repeatDelay: 3.5,
-                      duration: 1.2,
-                      ease: 'easeInOut'
-                    }}
-                  >
-                    <Bell className={`w-4 h-4 ${notifications.length > 0 ? 'text-amber-500 dark:text-amber-400' : ''}`} />
-                  </motion.div>
+                  <Bell className={`w-4 h-4 ${notifications.length > 0 ? 'text-amber-500 dark:text-amber-400' : ''}`} />
                   {notifications.length > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: [1, 1.3, 1] }}
-                      transition={{ repeat: Infinity, repeatDelay: 2, duration: 0.8 }}
+                      transition={{ duration: 0.35, ease: 'easeOut' }}
                       className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white dark:ring-slate-900 shadow-sm shadow-rose-500/50"
                     />
                   )}
@@ -398,9 +376,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                      className="absolute right-0 mt-2 w-80 sm:w-96 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 py-3 z-50 overflow-hidden"
+                      className="absolute right-0 mt-2 w-80 sm:w-96 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200/80 dark:border-white/10 py-3 z-50 overflow-hidden"
                     >
-                      <div className="px-4 pb-2 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                      <div className="px-4 pb-2 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <h4 className="text-xs font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
                             Alerts & Notifications
@@ -421,7 +399,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         )}
                       </div>
 
-                      <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 scrollbar-none">
+                      <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-white/5 scrollbar-none">
                         <AnimatePresence mode="popLayout">
                           {notifications.length === 0 ? (
                             <motion.div
@@ -481,16 +459,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {/* Theme Mode Selector Icon (Present in Every Portal on Mobile, Tablet & Desktop) */}
+            {/* Theme Mode Selector */}
             <div className="relative theme-dropdown-container">
               <button
                 onClick={() => setShowThemeMenu(!showThemeMenu)}
                 className={`p-2 sm:p-2.5 rounded-2xl border transition-all duration-300 flex items-center justify-center gap-1.5 shadow-sm active:scale-95 ${
                   themeMode === 'light'
-                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20'
+                    ? 'bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-500/10 dark:border-amber-500/25 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-500/20'
                     : themeMode === 'dark'
-                    ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-500/20'
-                    : 'bg-cyan-500/10 border-cyan-500/30 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-500/10 dark:border-indigo-500/25 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500/20'
+                    : 'bg-cyan-50 border-cyan-200 text-cyan-700 dark:bg-cyan-500/10 dark:border-cyan-500/25 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-500/20'
                 }`}
                 title={`Theme Mode: ${themeMode.toUpperCase()} (Resolved: ${resolvedTheme})`}
               >
@@ -505,7 +483,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       className="flex items-center gap-1.5"
                     >
                       <SunMedium className="w-4 h-4 text-amber-500" />
-                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 hidden xl:inline">Light</span>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300 hidden xl:inline">Light</span>
                     </motion.div>
                   )}
                   {themeMode === 'dark' && (
@@ -517,8 +495,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                       transition={{ type: 'spring', stiffness: 350, damping: 22 }}
                       className="flex items-center gap-1.5"
                     >
-                      <MoonStar className="w-4 h-4 text-indigo-400" />
-                      <span className="text-[10px] font-black uppercase tracking-wider text-indigo-400 hidden xl:inline">Dark</span>
+                      <MoonStar className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300 hidden xl:inline">Dark</span>
                     </motion.div>
                   )}
                   {themeMode === 'system' && (
@@ -546,7 +524,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                    className="absolute right-0 mt-2 w-48 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 dark:border-white/10 py-2 z-50 overflow-hidden"
+                    className="absolute right-0 mt-2 w-52 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/80 dark:border-white/10 py-2 z-50 overflow-hidden"
                   >
                     <div className="px-3 py-1.5 border-b border-slate-100 dark:border-white/5 mb-1">
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
@@ -558,8 +536,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => { setThemeMode('light'); setShowThemeMenu(false); }}
                       className={`w-full px-3.5 py-2.5 text-xs font-bold flex items-center justify-between transition-all duration-200 ${
                         themeMode === 'light'
-                          ? 'text-amber-700 dark:text-amber-300 bg-amber-500/15 font-extrabold'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-950/30'
+                          ? 'text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-500/15 font-extrabold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-amber-50/80 dark:hover:bg-amber-950/30'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
@@ -578,8 +556,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => { setThemeMode('dark'); setShowThemeMenu(false); }}
                       className={`w-full px-3.5 py-2.5 text-xs font-bold flex items-center justify-between transition-all duration-200 ${
                         themeMode === 'dark'
-                          ? 'text-indigo-700 dark:text-indigo-300 bg-indigo-500/15 font-extrabold'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/30'
+                          ? 'text-indigo-800 dark:text-indigo-200 bg-indigo-50 dark:bg-indigo-500/15 font-extrabold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-indigo-50/80 dark:hover:bg-indigo-950/30'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
@@ -598,8 +576,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => { setThemeMode('system'); setShowThemeMenu(false); }}
                       className={`w-full px-3.5 py-2.5 text-xs font-bold flex items-center justify-between transition-all duration-200 ${
                         themeMode === 'system'
-                          ? 'text-cyan-700 dark:text-cyan-300 bg-cyan-500/15 font-extrabold'
-                          : 'text-slate-700 dark:text-slate-300 hover:bg-cyan-50 dark:hover:bg-cyan-950/30'
+                          ? 'text-cyan-800 dark:text-cyan-200 bg-cyan-50 dark:bg-cyan-500/15 font-extrabold'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-cyan-50/80 dark:hover:bg-cyan-950/30'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
@@ -618,9 +596,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               </AnimatePresence>
             </div>
 
-            {/* User Profile / Logout or Login Button */}
+            {/* User Profile / Logout or Login */}
             {user ? (
-              <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-white/10">
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-200/80 dark:border-white/10">
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
@@ -631,7 +609,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <img
                       src={user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
                       alt={user.name}
-                      className="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-500 shadow-sm"
+                      className="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-500/80 shadow-sm"
                     />
                     <span className="sr-only">Edit avatar</span>
                   </button>
@@ -642,7 +620,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
                 <button
                   onClick={logout}
-                  className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-black text-xs shadow-md shadow-rose-600/20 border border-rose-400/40 flex items-center gap-1 transition-all"
+                  className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white font-black text-xs shadow-md shadow-rose-600/20 border border-rose-400/30 flex items-center gap-1 transition-all"
                   title="Logout"
                 >
                   <LogOut className="w-3.5 h-3.5 text-white" />
@@ -652,13 +630,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={() => handleTabChange('portal_login')}
-                className="px-3 py-1.5 rounded-xl text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-all flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-xl text-xs font-extrabold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5"
               >
                 <LogIn className="w-4 h-4" /> <span className="hidden xs:inline">Portal</span> Login
               </button>
             )}
 
-            {/* Avatar picker modal */}
             {user && (
               <AvatarPickerModal
                 isOpen={avatarModalOpen}
@@ -668,10 +645,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               />
             )}
 
-            {/* Hamburger Mobile/Tablet Drawer Toggle */}
+            {/* Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 transition-colors active:scale-95"
+              className="lg:hidden p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200/80 dark:border-white/10 transition-colors active:scale-95"
               title="Toggle Portal Menu"
             >
               <AnimatePresence mode="wait">
@@ -702,80 +679,75 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
+      {/* Guest Horizontal Nav */}
       {role === 'guest' && (
-        <div className="bg-slate-900 dark:bg-slate-950 border-t border-slate-800/80 px-2 sm:px-4 py-1.5 w-full max-w-full min-w-0 overflow-hidden">
-          {/* Scrollable Horizontal Navigation Container with Interactive Arrow Buttons */}
-        <div className="relative max-w-7xl mx-auto flex items-center min-w-0 w-full">
-          
-          {/* Scroll Left Button - Only in Mobile/Tablet View */}
-          {showLeftScroll && (
-            <button
-              onClick={() => scrollNav('left')}
-              className="lg:hidden absolute left-0 z-20 p-1.5 rounded-r-xl bg-indigo-600/90 text-white shadow-lg backdrop-blur-md hover:bg-indigo-500 transition-all active:scale-95 shrink-0"
-              title="Scroll Menu Left"
+        <div className="bg-slate-900 dark:bg-slate-950 border-t border-slate-800/60 dark:border-white/5 px-2 sm:px-4 py-1.5 w-full max-w-full min-w-0 overflow-hidden">
+          <div className="relative max-w-7xl mx-auto flex items-center min-w-0 w-full">
+            
+            {showLeftScroll && (
+              <button
+                onClick={() => scrollNav('left')}
+                className="lg:hidden absolute left-0 z-20 p-1.5 rounded-r-xl bg-indigo-600/90 text-white shadow-lg backdrop-blur-md hover:bg-indigo-500 transition-all active:scale-95 shrink-0"
+                title="Scroll Menu Left"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            )}
+
+            {showLeftScroll && (
+              <div className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-slate-900 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
+            )}
+
+            <nav
+              ref={navScrollRef}
+              className="w-full min-w-0 flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none scroll-smooth px-1"
             >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-          )}
+              {currentNavItems.map(item => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleTabChange(item.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 shrink-0 ${
+                      isActive
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25 ring-1 ring-indigo-400/50'
+                        : 'text-slate-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-slate-500'}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
 
-          {/* Left Fade Gradient - Only in Mobile/Tablet View */}
-          {showLeftScroll && (
-            <div className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-slate-900 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
-          )}
+            {showRightScroll && (
+              <div className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-900 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
+            )}
 
-          {/* Nav Links Strip */}
-          <nav
-            ref={navScrollRef}
-            className="w-full min-w-0 flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none scroll-smooth px-1"
-          >
-            {currentNavItems.map(item => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleTabChange(item.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 shrink-0 ${
-                    isActive
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30 ring-1 ring-indigo-400'
-                      : 'text-slate-300 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+            {showRightScroll && (
+              <button
+                onClick={() => scrollNav('right')}
+                className="lg:hidden absolute right-0 z-20 p-1.5 rounded-l-xl bg-indigo-600/90 text-white shadow-lg backdrop-blur-md hover:bg-indigo-500 transition-all active:scale-95 animate-pulse"
+                title="Scroll Menu Right to see more modules"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
-          {/* Right Fade Gradient - Only in Mobile/Tablet View */}
-          {showRightScroll && (
-            <div className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-900 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
-          )}
-
-          {/* Scroll Right Button - Only in Mobile/Tablet View */}
-          {showRightScroll && (
-            <button
-              onClick={() => scrollNav('right')}
-              className="lg:hidden absolute right-0 z-20 p-1.5 rounded-l-xl bg-indigo-600/90 text-white shadow-lg backdrop-blur-md hover:bg-indigo-500 transition-all active:scale-95 animate-pulse"
-              title="Scroll Menu Right to see more modules"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          )}
+          {/* Progress bar */}
+          <div className="w-full h-0.5 bg-slate-800/80 rounded-full mt-1 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-amber-400 transition-all duration-150"
+              style={{ width: `${Math.max(15, scrollPercent)}%` }}
+            />
+          </div>
         </div>
-
-        {/* Glowing Progress Bar Line */}
-        <div className="w-full h-0.5 bg-slate-800 rounded-full mt-1 overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-400 transition-all duration-150"
-            style={{ width: `${Math.max(15, scrollPercent)}%` }}
-          />
-        </div>
-      </div>
       )}
 
-      {/* MOBILE & TABLET DRAWER MENU (Cleanly Contains All Portals and All Menu Items) */}
+      {/* Mobile & Tablet Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -783,14 +755,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             animate={{ opacity: 1, height: 'auto', scaleY: 1 }}
             exit={{ opacity: 0, height: 0, scaleY: 0.95 }}
             transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-            className="lg:hidden border-t border-slate-200 dark:border-white/10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl px-3 py-3 space-y-3 shadow-2xl overflow-hidden max-w-full min-w-0 origin-top"
+            className="lg:hidden border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl px-3 py-3 space-y-3 shadow-2xl overflow-hidden max-w-full min-w-0 origin-top"
           >
-            {/* Mobile Portal Selection Header */}
             <motion.div
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
-              className="p-2 sm:p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 space-y-1.5"
+              className="p-2 sm:p-2.5 rounded-xl bg-slate-50/90 dark:bg-slate-800/60 border border-slate-200/80 dark:border-white/10 space-y-1.5"
             >
               <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                 Select Active Portal:
@@ -801,7 +772,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all text-center ${
                     role === 'guest'
                       ? 'bg-indigo-600 text-white shadow font-black scale-[1.02]'
-                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 font-semibold'
+                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 font-semibold'
                   }`}
                 >
                   Public Site
@@ -811,7 +782,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all text-center ${
                     role === 'teacher'
                       ? 'bg-amber-500 text-slate-950 shadow font-black scale-[1.02]'
-                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 font-semibold'
+                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 font-semibold'
                   }`}
                 >
                   Teacher Control
@@ -821,7 +792,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all text-center ${
                     role === 'student'
                       ? 'bg-emerald-500 text-slate-950 shadow font-black scale-[1.02]'
-                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 font-semibold'
+                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 font-semibold'
                   }`}
                 >
                   Student Portal
@@ -831,7 +802,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[11px] font-extrabold transition-all text-center ${
                     role === 'parent'
                       ? 'bg-purple-500 text-white shadow font-black scale-[1.02]'
-                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 font-semibold'
+                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10 font-semibold'
                   }`}
                 >
                   Parent Portal
@@ -839,7 +810,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </motion.div>
 
-            {/* All Portal Menu Items */}
             <div className="space-y-1">
               <span className="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-1 block mb-1">
                 {role.toUpperCase()} Menu Modules ({currentNavItems.length}):
@@ -861,7 +831,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       className={`w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center gap-2 ${
                         isActive
                           ? 'bg-indigo-600 text-white shadow-sm font-extrabold'
-                          : 'text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/50'
+                          : 'text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-white/5'
                       }`}
                     >
                       <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-indigo-500'}`} />
@@ -872,15 +842,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
 
-            {/* Quick Actions & CTAs */}
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-1.5">
+            <div className="pt-2 border-t border-slate-200/80 dark:border-white/10 flex flex-col gap-1.5">
               {role === 'guest' && (
                 <>
                   <button
                     onClick={() => { openFreeDemo(); setMobileMenuOpen(false); }}
-                    className="w-full py-2 bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-sm"
+                    className="w-full py-2 bg-amber-50 text-amber-900 border border-amber-200 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-sm dark:bg-amber-500/15 dark:text-amber-200 dark:border-amber-500/25"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Book Free Demo Class
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" /> Book Free Demo Class
                   </button>
                   <button
                     onClick={() => { openAdmission(); setMobileMenuOpen(false); }}

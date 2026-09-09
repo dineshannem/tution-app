@@ -55,13 +55,15 @@ export const FreeDemoModal: React.FC<FreeDemoModalProps> = ({ isOpen, onClose, o
         body: JSON.stringify(formData)
       });
       const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Unable to submit demo request.');
+      }
       setLoading(false);
       setSubmitted(true);
       onSuccessToast("Free Demo request submitted! SSR Sir will contact you shortly.");
     } catch (err) {
       setLoading(false);
-      onSuccessToast("Demo registered successfully!");
-      setSubmitted(true);
+      setError(err instanceof Error ? err.message : 'Unable to submit demo request. Please try again.');
     }
   };
 

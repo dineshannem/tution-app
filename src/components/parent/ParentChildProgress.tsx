@@ -9,15 +9,16 @@ export const ParentChildProgress: React.FC = () => {
   const [results, setResults] = useState<TestResult[]>([]);
 
   useEffect(() => {
-    if (!user?.studentId) {
-      setResults([]);
-      return;
-    }
-    fetch(`/api/test-results?studentId=${encodeURIComponent(user.studentId)}`)
+    fetch('/api/students')
+      .then(r => r.json())
+      .then(students => {
+        const childId = user?.studentId || students.find((student: any) => student.parentEmail === user?.email)?.id;
+        return childId ? fetch(`/api/test-results?studentId=${encodeURIComponent(childId)}`) : Promise.resolve({ json: () => Promise.resolve([]) });
+      })
       .then(r => r.json())
       .then(d => setResults(d))
       .catch(err => console.error(err));
-  }, [user]);
+  }, [user?.studentId, user?.email]);
 
   const chartData = results.map(r => ({
     name: r.title.length > 15 ? r.title.substring(0, 15) + '...' : r.title,
@@ -54,7 +55,7 @@ export const ParentChildProgress: React.FC = () => {
 
       {/* Marks Table */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-        <table className="w-full text-left border-collapse">
+        <table className="table-scroll w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
               <th className="p-4">Test Title</th>

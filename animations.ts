@@ -1,5 +1,5 @@
 export const fadeInUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 4 },
   visible: { 
     opacity: 1, 
     y: 0,

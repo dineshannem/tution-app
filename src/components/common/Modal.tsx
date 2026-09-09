@@ -44,7 +44,7 @@ export const Modal: React.FC<ModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-            className={`relative z-10 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/90 dark:border-white/10 w-full ${maxWidth} overflow-hidden my-8`}
+            className={`relative z-10 flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-2xl dark:border-white/10 dark:bg-slate-900 ${maxWidth} my-4 sm:my-8`}
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200/80 dark:border-white/10 bg-slate-50/80 dark:bg-slate-800/60 backdrop-blur-md">
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">{title}</h3>
@@ -56,7 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">{children}</div>
+            <div className="min-h-0 overflow-y-auto p-4 custom-scrollbar sm:p-6">{children}</div>
           </motion.div>
         </div>
       )}

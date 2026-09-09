@@ -27,8 +27,8 @@ export const StudentClasses: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Live Online Classes (Google Meet)</h1>
-        <p className="text-xs text-slate-500">Join live interactive sessions with SSR Sir and watch recorded video lessons.</p>
+        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Live Online Classes</h1>
+        <p className="text-xs text-slate-500">Join Google Meet or Zoom sessions with SSR Sir and watch recorded video lessons.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -70,7 +70,7 @@ export const StudentClasses: React.FC = () => {
                 rel="noreferrer"
                 className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-colors"
               >
-                <Video className="w-4 h-4" /> Open Google Meet Link
+                <Video className="w-4 h-4" /> Open {c.platform || 'Google Meet'} Link
               </a>
 
               {c.recordedVideoUrl && (

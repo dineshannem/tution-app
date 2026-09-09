@@ -1,20 +1,12 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+## SSR Tuition Management System
 
-# Run and deploy your AI Studio app
+SSR Tuition is a single-teacher learning portal for Classes 1-10. It provides public admission and free-demo forms plus dedicated teacher, student, and parent portals for students, batches, attendance, homework, study materials, online classes, tests, fees, reviews, and request history.
 
-This contains everything you need to run your app locally.
+### Run locally
 
-View your app in AI Studio: https://ai.studio/apps/9f434d2f-018f-4515-b0fc-e5514a8a185a
+```bash
+npm install
+npm run dev
+```
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The development server serves the Vite application and REST-style demo API together. Use the credentials in `credentials.txt` to test each portal.

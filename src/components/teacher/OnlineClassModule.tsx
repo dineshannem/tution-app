@@ -20,6 +20,7 @@ export const OnlineClassModule: React.FC<OnlineClassModuleProps> = ({ onSuccessT
     date: new Date().toISOString().split('T')[0],
     startTime: '18:00',
     endTime: '19:30',
+    platform: 'Google Meet' as 'Google Meet' | 'Zoom',
     meetLink: 'https://meet.google.com/ssr-tui-math',
     recordedVideoUrl: ''
   });
@@ -54,7 +55,7 @@ export const OnlineClassModule: React.FC<OnlineClassModuleProps> = ({ onSuccessT
       });
       const data = await res.json();
       if (data.success) {
-        onSuccessToast(`Google Meet scheduled & batch notified!`);
+        onSuccessToast(`${payload.platform} session scheduled & batch notified!`);
         setIsModalOpen(false);
         loadClasses();
       }
@@ -68,7 +69,7 @@ export const OnlineClassModule: React.FC<OnlineClassModuleProps> = ({ onSuccessT
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Google Meet Online Classes</h1>
+            <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Online Meeting Schedule</h1>
           <p className="text-xs text-slate-500">Schedule live Google Meet sessions, broadcast reminders, and link recorded classes.</p>
         </div>
 
@@ -76,7 +77,7 @@ export const OnlineClassModule: React.FC<OnlineClassModuleProps> = ({ onSuccessT
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2"
         >
-          <Plus className="w-4 h-4" /> Schedule Google Meet
+          <Plus className="w-4 h-4" /> Schedule Meeting
         </button>
       </div>
 
@@ -107,7 +108,7 @@ export const OnlineClassModule: React.FC<OnlineClassModuleProps> = ({ onSuccessT
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-indigo-500" />
-                  <span>{c.startTime} - {c.endTime}</span>
+                  <span>{c.startTime} - {c.endTime} • {c.platform || 'Google Meet'}</span>
                 </div>
               </div>
             </div>
@@ -119,7 +120,7 @@ export const OnlineClassModule: React.FC<OnlineClassModuleProps> = ({ onSuccessT
                 rel="noreferrer"
                 className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow transition-colors"
               >
-                <Video className="w-4 h-4" /> Start / Join Google Meet
+                <Video className="w-4 h-4" /> Start / Join {c.platform || 'Google Meet'}
               </a>
 
               {c.recordedVideoUrl && (
@@ -137,7 +138,7 @@ export const OnlineClassModule: React.FC<OnlineClassModuleProps> = ({ onSuccessT
         ))}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Schedule New Google Meet Session">
+          <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Schedule New Online Session">
         <form onSubmit={handleCreate} className="space-y-4">
           <div>
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Session Title *</label>
@@ -189,6 +190,20 @@ export const OnlineClassModule: React.FC<OnlineClassModuleProps> = ({ onSuccessT
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Platform *</label>
+              <select value={formData.platform} onChange={e => setFormData({ ...formData, platform: e.target.value as 'Google Meet' | 'Zoom' })} className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none">
+                <option>Google Meet</option>
+                <option>Zoom</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Meeting Link *</label>
+              <input required value={formData.meetLink} onChange={e => setFormData({ ...formData, meetLink: e.target.value })} className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-xs outline-none" />
             </div>
           </div>
 

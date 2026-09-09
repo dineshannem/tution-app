@@ -57,7 +57,7 @@ export const PublicCourses: React.FC<PublicCoursesProps> = ({ openFreeDemo, open
 
   return (
     <PageTransition>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+      <div className="public-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -108,7 +108,7 @@ export const PublicCourses: React.FC<PublicCoursesProps> = ({ openFreeDemo, open
           <motion.div
   key={idx}
   variants={listItem}
-  whileHover={{ y: -20, scale: 1.02 }}
+  whileHover={{ y: -4, scale: 1.01 }}
   className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm hover:shadow-xl transition-all space-y-5 flex flex-col justify-between"
 >
             <div className="space-y-3">

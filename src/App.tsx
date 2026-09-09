@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import { useAuth } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
@@ -35,6 +35,7 @@ import { TestResultModule } from './components/teacher/TestResultModule';
 import { FeeManagement } from './components/teacher/FeeManagement';
 import { GalleryAdmin } from './components/teacher/GalleryAdmin';
 import { CredentialsManagement } from './components/teacher/CredentialsManagement';
+import { TeacherHistory } from './components/teacher/TeacherHistory';
 
 // Student panel components
 import { StudentDashboard } from './components/student/StudentDashboard';
@@ -55,24 +56,33 @@ import { ParentSchedule } from './components/parent/ParentSchedule';
 
 export default function App() {
   const { user, role, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('home');
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
-  const [isAdmissionModalOpen, setIsAdmissionModalOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => window.innerWidth < 768);
-
-  const isPortalView = !!user && role !== 'guest';
-
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 200,
+  const scrollScale = useSpring(scrollYProgress, {
+    stiffness: 120,
     damping: 30,
     restDelta: 0.001
   });
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('ssr_active_tab') || 'home');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+  const [isAdmissionModalOpen, setIsAdmissionModalOpen] = useState(false);
+  const contentScrollRef = useRef<HTMLDivElement>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
+
+  const isPortalView = !!user && role !== 'guest';
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    localStorage.setItem('ssr_active_tab', activeTab);
+    contentScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeTab]);
+
+  useEffect(() => {
+    if (!user) {
+      setActiveTab(current => current.startsWith('t_') || current.startsWith('s_') || current.startsWith('p_') ? 'home' : current);
+    }
+  }, [user]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -145,6 +155,14 @@ export default function App() {
         return <TestResultModule onSuccessToast={showToast} />;
       case 't_fees':
         return <FeeManagement onSuccessToast={showToast} />;
+      case 't_payment_history':
+        return <FeeManagement onSuccessToast={showToast} />;
+      case 't_approval_history':
+        return <TeacherHistory title="Application Approval History" endpoint="/api/admission-requests" />;
+      case 't_demo_history':
+        return <TeacherHistory title="Free Demo History" endpoint="/api/demo-requests" />;
+      case 't_enquiry_history':
+        return <TeacherHistory title="Public Enquiry History" endpoint="/api/enquiries" />;
       case 't_gallery':
         return <GalleryAdmin onSuccessToast={showToast} />;
       case 't_approvals':
@@ -233,16 +251,16 @@ export default function App() {
 
   const contentPaddingClass = isPortalView
     ? sidebarCollapsed
-      ? 'pl-20 md:pl-20 lg:pl-20'
-      : 'pl-[260px] md:pl-[260px] lg:pl-[260px]'
+      ? 'lg:pl-20'
+      : 'lg:pl-[260px]'
     : '';
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-300">
-      {/* Top Scroll Progress Bar */}
+    <div className="h-screen flex flex-col text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-300 overflow-hidden">
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-500 origin-left z-50 shadow-sm"
-        style={{ scaleX }}
+        aria-hidden="true"
+        className="fixed left-0 right-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-indigo-500 via-cyan-400 to-amber-400 shadow-sm"
+        style={{ scaleX: scrollScale }}
       />
 
       {/* Toast Notification */}
@@ -251,27 +269,26 @@ export default function App() {
       {/* Main Navbar */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} openFreeDemo={openFreeDemo} openAdmission={openAdmission} />
 
-      <div className={"flex-1 min-h-screen relative " + contentPaddingClass}>
-        {/* Dynamic Main View with Spring Motion Page Transitions */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 12, scale: 0.995 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -12, scale: 0.995 }}
-            transition={{
-              type: 'spring',
-              stiffness: 320,
-              damping: 28,
-              mass: 0.8
-            }}
-            className="w-full"
-          >
-            {renderActiveView()}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+      <div ref={contentScrollRef} className={"portal-main flex-1 min-h-0 overflow-y-auto relative " + contentPaddingClass}>
+        {/* Dynamic Main View with lightweight motion transitions */}
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-5 lg:px-8 py-4 sm:py-6 lg:py-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full"
+            >
+              {renderActiveView()}
+            </motion.div>
+          </AnimatePresence>
+        </main>
+
+        {!isPortalView && (
+          <PublicFooter setActiveTab={setActiveTab} openFreeDemo={openFreeDemo} openAdmission={openAdmission} />
+        )}
       </div>
 
       {/* Global Modals */}
@@ -287,10 +304,6 @@ export default function App() {
         onSuccessToast={(msg) => showToast(msg)}
       />
 
-      {/* Footer (public pages only) */}
-      {!isPortalView && (
-        <PublicFooter setActiveTab={setActiveTab} openFreeDemo={openFreeDemo} openAdmission={openAdmission} />
-      )}
       {isPortalView && (
         <Sidebar
           role={user?.role as 'teacher' | 'student' | 'parent'}
