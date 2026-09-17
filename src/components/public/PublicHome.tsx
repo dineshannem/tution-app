@@ -137,8 +137,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
       <div className="public-page space-y-20 pb-16">
 
         {/* 1. Hero */}
-        <section className="relative overflow-hidden bg-slate-950/70 text-white pt-12 pb-20 rounded-3xl mx-4 sm:mx-6 lg:mx-8 mt-4 shadow-2xl border border-white/10 backdrop-blur-2xl">
-          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-950/80 via-slate-900/90 to-purple-950/80 opacity-90" />
+        <section className="relative overflow-hidden bg-slate-50 text-slate-950 pt-12 pb-20 rounded-3xl mx-4 sm:mx-6 lg:mx-8 mt-4 shadow-2xl border border-slate-200/80 backdrop-blur-2xl dark:bg-slate-950/70 dark:text-white dark:border-white/10">
+          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-100 via-slate-50 to-purple-100 opacity-90 dark:from-indigo-950/80 dark:via-slate-900/90 dark:to-purple-950/80 dark:opacity-90" />
           <div className="absolute -top-32 -right-32 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl pointer-events-none" />
 
@@ -149,20 +149,20 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="lg:col-span-7 space-y-6 text-center lg:text-left"
             >
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-wide shadow-sm">
-                <Sparkles className="w-4 h-4 text-amber-400" /> ADMISSIONS OPEN FOR ACADEMIC YEAR 2026-27
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold tracking-wide shadow-sm dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-300">
+                <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" /> ADMISSIONS OPEN FOR ACADEMIC YEAR 2026-27
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight text-slate-950 dark:text-white">
                 Empowering Students for Board Excellence in{' '}
-                <span className="bg-gradient-to-r from-amber-300 via-amber-200 to-orange-300 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-amber-700 via-amber-500 to-orange-500 bg-clip-text text-transparent dark:from-amber-300 dark:via-amber-200 dark:to-orange-300">
                   Classes 1 to 10
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-300 max-w-2xl leading-relaxed">
+              <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed dark:text-slate-300">
                 SSR Tuition offers dedicated single-teacher instruction for CBSE & State Board students. Small batches, daily homework, weekly tests, and explanation in both{' '}
-                <span className="text-amber-300 font-semibold">Telugu & English</span> for guaranteed concept clarity.
+                <span className="text-amber-700 font-semibold dark:text-amber-300">Telugu & English</span> for guaranteed concept clarity.
               </p>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
@@ -185,15 +185,15 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                 </motion.button>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/10 text-center lg:text-left">
+              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200 dark:border-white/10 text-center lg:text-left">
                 {[
-                  { value: '15+ Yrs', label: 'Teaching Experience', color: 'text-amber-300' },
-                  { value: 'Max 15', label: 'Students Per Batch', color: 'text-indigo-300' },
-                  { value: '98%', label: 'Board Pass Rate', color: 'text-emerald-400' }
+                  { value: '15+ Yrs', label: 'Teaching Experience', color: 'text-amber-700 dark:text-amber-300' },
+                  { value: 'Max 15', label: 'Students Per Batch', color: 'text-indigo-700 dark:text-indigo-300' },
+                  { value: '98%', label: 'Board Pass Rate', color: 'text-emerald-700 dark:text-emerald-400' }
                 ].map((stat, i) => (
                   <div key={i}>
                     <div className={`text-2xl font-black ${stat.color}`}>{stat.value}</div>
-                    <div className="text-xs text-slate-400">{stat.label}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -205,7 +205,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
               transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               className="lg:col-span-5 flex justify-center"
             >
-              <div className="relative w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/15 rounded-3xl p-6 shadow-2xl space-y-4">
+              <div className="relative w-full max-w-md bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-slate-300/60 dark:border-white/15 rounded-3xl p-6 shadow-2xl space-y-4">
                 <div className="relative rounded-2xl overflow-hidden h-52">
                   <img
                     src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&auto=format&fit=crop&q=80"
@@ -217,7 +217,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     Owner-Teacher SSR Sir (Samba Siva Reddy Annem)
                   </span>
                 </div>
-                <div className="space-y-2 text-xs text-slate-300">
+                <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
                   {[
                     'Classes 1–10 (CBSE & State Board)',
                     'Special Care for Weak & Shy Students',
@@ -225,7 +225,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
                     'Online Google Meet + Offline Classroom Batches'
                   ].map((text, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                       <span>{text}</span>
                     </div>
                   ))}

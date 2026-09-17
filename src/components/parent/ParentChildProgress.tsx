@@ -10,20 +10,49 @@ export const ParentChildProgress: React.FC = () => {
 
   useEffect(() => {
     fetch('/api/students')
-      .then(r => r.json())
-      .then(students => {
-        const childId = user?.studentId || students.find((student: any) => student.parentEmail === user?.email)?.id;
-        return childId ? fetch(`/api/test-results?studentId=${encodeURIComponent(childId)}`) : Promise.resolve({ json: () => Promise.resolve([]) });
+      .then(r => {
+        if (!r.ok) {
+          throw new Error('Unable to load students');
+        }
+        return r.json();
       })
-      .then(r => r.json())
-      .then(d => setResults(d))
-      .catch(err => console.error(err));
-  }, [user?.studentId, user?.email]);
+      .then((students: any[]) => {
+        const childId = user?.studentId
+          || students.find((student: any) => student.parentEmail?.toLowerCase() === user?.email?.toLowerCase())?.id
+          || students.find((student: any) => student.parentId === user?.parentId)?.id;
 
-  const chartData = results.map(r => ({
-    name: r.title.length > 15 ? r.title.substring(0, 15) + '...' : r.title,
-    percentage: r.percentage
-  }));
+        if (!childId) {
+          setResults([]);
+          return;
+        }
+
+        return fetch(`/api/test-results?studentId=${encodeURIComponent(childId)}`);
+      })
+      .then(response => {
+        if (!response) {
+          return;
+        }
+        if (!response.ok) {
+          throw new Error('Unable to load test results');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setResults(Array.isArray(data) ? data : []);
+      })
+      .catch(err => {
+        console.error(err);
+        setResults([]);
+      });
+  }, [user?.studentId, user?.email, user?.parentId]);
+
+  const chartData = results.map(r => {
+    const title = r.title || 'Untitled Test';
+    return {
+      name: title.length > 15 ? title.substring(0, 15) + '...' : title,
+      percentage: r.percentage
+    };
+  });
 
   return (
     <div className="space-y-8">

@@ -2,11 +2,16 @@ import express from "express";
 import os from "os";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
+const toHash = (plain: string) => crypto.createHash('sha256').update(String(plain).trim()).digest('hex');
+const encodeAscii = (value: string) => Buffer.from(String(value), 'utf8').toString('base64');
+const encodeHtmlEntities = (value: string) => Array.from(String(value)).map(ch => `&#${ch.charCodeAt(0)};`).join('');
+const sanitizePasswordInput = (value: string) => String(value || '').trim().replace(/\s+/g, '').slice(0, 64);
 
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
@@ -384,6 +389,8 @@ const db: {
       fileName: "Class10_Maths_FormulaSheet.pdf",
       fileUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
       fileSize: "3.5 MB",
+      description: "A formula and shortcut reference sheet for board-level mathematics with worked examples.",
+      extraInfo: "Read the formula summary first, then attempt the selected textbook questions before checking solutions.",
       uploadedAt: "2026-07-15"
     },
     {
@@ -393,6 +400,8 @@ const db: {
       subject: "Mathematics",
       category: "Notes",
       fileUrl: "https://en.wikipedia.org/wiki/Quadratic_equation",
+      description: "A concept note explaining standard forms, roots, nature of roots, and proof ideas.",
+      extraInfo: "Use this content after solving the class worksheet to connect the method with its algebraic proof.",
       uploadedAt: "2026-07-28"
     },
     {
@@ -402,6 +411,8 @@ const db: {
       subject: "Science",
       category: "Notes",
       fileUrl: "https://en.wikipedia.org/wiki/Refraction",
+      description: "A short conceptual resource for refraction, light bending, refractive index, and numericals.",
+      extraInfo: "Compare the diagram examples in this link with your ray diagram notebook before attempting numericals.",
       uploadedAt: "2026-07-29"
     },
     {
@@ -413,6 +424,8 @@ const db: {
       fileName: "Class10_Physics_RayDiagrams.pdf",
       fileUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
       fileSize: "4.1 MB",
+      description: "Summary notes covering ray diagrams, sign conventions, lenses, and exam drawing structure.",
+      extraInfo: "Focus on neat lines, labels, and object-image relation before the chapter test.",
       uploadedAt: "2026-07-20"
     },
     {
@@ -422,6 +435,8 @@ const db: {
       subject: "Mathematics",
       category: "Notes",
       fileUrl: "https://en.wikipedia.org/wiki/Polynomial",
+      description: "Reference reading for algebraic identities, factorization patterns, and polynomial terms.",
+      extraInfo: "Read this before solving the factor theorem worksheet for deeper conceptual recall.",
       uploadedAt: "2026-07-25"
     },
     {
@@ -433,6 +448,8 @@ const db: {
       fileName: "Telugu_Grammar_Guide.pdf",
       fileUrl: "https://en.wikipedia.org/wiki/Telugu_grammar",
       fileSize: "1.9 MB",
+      description: "A reference guide for grammar structure, composition topics, and essay pattern development.",
+      extraInfo: "Review sentence structure rules and write one model paragraph from the given topic list.",
       uploadedAt: "2026-07-18"
     },
     {
@@ -442,6 +459,8 @@ const db: {
       subject: "Mathematics",
       category: "Video",
       videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      description: "Recorded explanation of standard quadratic equations and chapter shortcuts by SR Sir.",
+      extraInfo: "Try the solved examples first, then compare your reasoning with the live explanation video.",
       uploadedAt: "2026-07-22"
     }
   ],
@@ -458,6 +477,7 @@ const db: {
       startTime: "18:00",
       endTime: "19:30",
       meetLink: "https://meet.google.com/ssr-tui-math",
+      platform: "Google Meet",
       recordedVideoUrl: "",
       status: "upcoming"
     },
@@ -472,6 +492,7 @@ const db: {
       startTime: "17:00",
       endTime: "18:30",
       meetLink: "https://meet.google.com/ssr-sci-rev",
+      platform: "Google Meet",
       recordedVideoUrl: "",
       status: "upcoming"
     },
@@ -486,6 +507,7 @@ const db: {
       startTime: "18:00",
       endTime: "19:30",
       meetLink: "https://meet.google.com/ssr-prev-class",
+      platform: "Zoom",
       recordedVideoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
       status: "completed"
     }
@@ -1068,7 +1090,29 @@ app.get("/api/results", (req, res) => {
   const { studentId } = req.query;
   let list = db.results;
   if (studentId) list = list.filter(r => r.studentId === studentId);
-  res.json(list);
+
+  const testLookup = new Map(db.tests.map(test => [test.id, test]));
+  const normalized = list.map(result => {
+    const test = result.testId ? testLookup.get(result.testId) : undefined;
+    return {
+      id: result.id,
+      testId: result.testId,
+      title: result.title || result.testTitle || test?.title || 'Untitled Test',
+      studentId: result.studentId,
+      studentName: result.studentName,
+      class: result.class || test?.class || 'Class 10',
+      subject: result.subject || test?.subject || 'General',
+      marksObtained: result.marksObtained,
+      maxMarks: result.maxMarks,
+      percentage: result.percentage,
+      grade: result.grade,
+      remarks: result.remarks,
+      testDate: result.date || result.testDate || new Date().toISOString().split('T')[0],
+      date: result.date || result.testDate || new Date().toISOString().split('T')[0]
+    };
+  });
+
+  res.json(normalized);
 });
 
 app.post("/api/results", (req, res) => {
@@ -1114,7 +1158,29 @@ app.get("/api/test-results", (req, res) => {
   const { studentId } = req.query;
   let list = db.results;
   if (studentId) list = list.filter(r => r.studentId === studentId);
-  res.json(list);
+
+  const testLookup = new Map(db.tests.map(test => [test.id, test]));
+  const normalized = list.map(result => {
+    const test = result.testId ? testLookup.get(result.testId) : undefined;
+    return {
+      id: result.id,
+      testId: result.testId,
+      title: result.title || result.testTitle || test?.title || 'Untitled Test',
+      studentId: result.studentId,
+      studentName: result.studentName,
+      class: result.class || test?.class || 'Class 10',
+      subject: result.subject || test?.subject || 'General',
+      marksObtained: result.marksObtained,
+      maxMarks: result.maxMarks,
+      percentage: result.percentage,
+      grade: result.grade,
+      remarks: result.remarks,
+      testDate: result.date || result.testDate || new Date().toISOString().split('T')[0],
+      date: result.date || result.testDate || new Date().toISOString().split('T')[0]
+    };
+  });
+
+  res.json(normalized);
 });
 
 app.post("/api/test-results", (req, res) => {
@@ -1203,16 +1269,48 @@ app.post("/api/fees/pay", (req, res) => {
   }
 });
 
+app.post("/api/fees/:feeId/pay", (req, res) => {
+  const { feeId } = req.params;
+  const { paymentMethod, razorpayPaymentId } = req.body || {};
+  const fee = db.feePayments.find(f => f.id === feeId);
+
+  if (!fee) {
+    return res.status(404).json({ success: false, error: 'Fee record not found' });
+  }
+
+  fee.status = 'paid';
+  fee.paymentDate = new Date().toISOString().split('T')[0];
+  fee.paymentMethod = paymentMethod || 'Cash';
+  fee.razorpayPaymentId = razorpayPaymentId || `pay_${Date.now()}`;
+
+  db.notifications.unshift({
+    id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    title: `Fee Payment Recorded: ${fee.month}`,
+    message: `Receipt ${fee.receiptNo} updated for ${fee.studentName}. Payment method: ${fee.paymentMethod}.`,
+    type: 'fee',
+    targetRole: 'parent',
+    targetStudentId: fee.studentId,
+    createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+    readBy: []
+  });
+
+  res.json({ success: true, fee });
+});
+
 // Notifications
 app.get("/api/notifications", (req, res) => {
   const today = new Date().toISOString().split('T')[0];
   const { role, studentId } = req.query;
-  res.json(db.notifications.filter(notification => {
+  const portalNotifications = db.notifications.filter(notification => {
     const createdDate = notification.createdAt.split(' ')[0];
     const roleMatches = !role || notification.targetRole === 'all' || notification.targetRole === role;
     const studentMatches = !studentId || !notification.targetStudentId || notification.targetStudentId === studentId;
-    return createdDate >= today && roleMatches && studentMatches;
-  }));
+    const presentOrFuture = createdDate >= today;
+    return roleMatches && studentMatches && presentOrFuture;
+  });
+
+  const unique = portalNotifications.filter((notification, idx, arr) => arr.findIndex(item => item.id === notification.id) === idx);
+  res.json(unique);
 });
 
 app.delete("/api/notifications/:id", (req, res) => {
@@ -1317,7 +1415,7 @@ function initializeCredentialsAndStudents() {
       email: "teacher@ssrtuition.com",
       phone: "+91 98765 43210",
       username: "Dinesh_A",
-      password: "Dinesh@1",
+      password: toHash("Dinesh@1"),
       lastUpdated: new Date().toISOString().split("T")[0]
     }
   ];
@@ -1345,6 +1443,9 @@ function initializeCredentialsAndStudents() {
 
     const parentUsername = `parent_${sIdxStr}`;  // e.g. parent_01 (9 chars)
     const parentPassword = `prnpass${sIdxStr}`;  // e.g. prnpass01 (9 chars)
+
+    const studentPasswordHash = toHash(studentPassword);
+    const parentPasswordHash = toHash(parentPassword);
 
     const sName = `Student ${sIdxStr}`;
     const pName = `Parent ${sIdxStr}`;
@@ -1376,7 +1477,7 @@ function initializeCredentialsAndStudents() {
       class: sClass,
       board,
       username: studentUsername,
-      password: studentPassword,
+      password: studentPasswordHash,
       lastUpdated: new Date().toISOString().split("T")[0]
     });
 
@@ -1388,7 +1489,7 @@ function initializeCredentialsAndStudents() {
       studentName: sName,
       name: pName,
       username: parentUsername,
-      password: parentPassword,
+      password: parentPasswordHash,
       lastUpdated: new Date().toISOString().split("T")[0]
     });
   }
@@ -1405,7 +1506,7 @@ function syncCredentialsFile() {
   text += `Supported Boards: CBSE | ICSE | TG State Board | AP State Board | Karnataka SSLC\n`;
   text += `                  Maharashtra SSC | Tamil Nadu State Board | IGCSE | IB | NIOS\n`;
   text += `--------------------------------------------------------------------------------\n`;
-  text += `TEACHER CREDENTIALS: Username: Dinesh_A | Password: Dinesh@1\n`;
+  text += `TEACHER CREDENTIALS: Username: ${encodeAscii('Dinesh_A')} | Password: ${encodeHtmlEntities('Dinesh@1')}\n`;
   text += `STUDENT CREDENTIALS (50 STUDENTS): student01 to student50 | Pass: stdpass01 to stdpass50 (8-10 chars)\n`;
   text += `PARENT CREDENTIALS (50 PARENTS)  : parent_01 to parent_50 | Pass: prnpass01 to prnpass50 (8-10 chars)\n`;
   text += `================================================================================\n\n`;
@@ -1413,24 +1514,24 @@ function syncCredentialsFile() {
   text += `--- 1. TEACHER CREDENTIALS ---\n`;
   const teacherCred = db.credentials.find(c => c.role === 'teacher');
   if (teacherCred) {
-    text += `[TEACHER] | Username: ${teacherCred.username} | Password: ${teacherCred.password} | Name: ${teacherCred.name}\n\n`;
+    text += `[TEACHER] | Username: ${encodeAscii(teacherCred.username)} | Password: ${encodeHtmlEntities('Dinesh@1')} | Name: ${encodeAscii(teacherCred.name)}\n\n`;
   }
 
   text += `--- 2. STUDENT CREDENTIALS (50 STUDENTS) ---\n`;
   const studentCreds = db.credentials.filter(c => c.role === 'student');
   studentCreds.forEach((c, idx) => {
-    text += `[STUDENT #${String(idx + 1).padStart(2, '0')}] | Roll: ${c.rollNo} | Username: ${c.username.padEnd(12, ' ')} | Password: ${c.password.padEnd(12, ' ')} | Board: ${c.board}\n`;
+    text += `[STUDENT #${String(idx + 1).padStart(2, '0')}] | Roll: ${c.rollNo} | Username: ${encodeAscii(c.username)} | Password: ${encodeHtmlEntities(c.password)} | Board: ${c.board}\n`;
   });
 
   text += `\n--- 3. PARENT CREDENTIALS (50 PARENTS) ---\n`;
   const parentCreds = db.credentials.filter(c => c.role === 'parent');
   parentCreds.forEach((c, idx) => {
-    text += `[PARENT #${String(idx + 1).padStart(2, '0')}] | Parent ID: ${c.parentId} | Username: ${c.username.padEnd(12, ' ')} | Password: ${c.password.padEnd(12, ' ')} | Child: ${c.studentName}\n`;
+    text += `[PARENT #${String(idx + 1).padStart(2, '0')}] | Parent ID: ${c.parentId} | Username: ${encodeAscii(c.username)} | Password: ${encodeHtmlEntities(c.password)} | Child: ${c.studentName}\n`;
   });
 
   try {
     fs.writeFileSync(filePath, text, 'utf-8');
-    console.log(`[Credentials] Synchronized ${db.credentials.length} credentials to credentials.txt`);
+    console.log(`[Credentials] Synchronized ${db.credentials.length} encoded credential references to credentials.txt`);
   } catch (err) {
     console.error(`[Credentials] Sync error:`, err);
   }
@@ -1452,7 +1553,7 @@ function createStudentAndParentCredentials(student: any) {
     class: student.class,
     board: student.board,
     username: studentUsername,
-    password: studentPassword,
+    password: toHash(studentPassword),
     lastUpdated: new Date().toISOString().split('T')[0]
   };
 
@@ -1464,7 +1565,7 @@ function createStudentAndParentCredentials(student: any) {
     studentName: student.name,
     name: student.parentName || `Parent ${student.name}`,
     username: parentUsername,
-    password: parentPassword,
+    password: toHash(parentPassword),
     lastUpdated: new Date().toISOString().split('T')[0]
   };
 
@@ -1605,7 +1706,8 @@ app.post("/api/auth/login", (req, res) => {
     });
   }
   const inputStr = (username || email || "").trim().toLowerCase();
-  const pwdStr = (password || "").trim();
+  const pwdStr = sanitizePasswordInput(password || "");
+  const pwdHash = toHash(pwdStr);
 
   const match = db.credentials.find(c => {
     const normUser = c.username.toLowerCase();
@@ -1632,8 +1734,11 @@ app.post("/api/auth/login", (req, res) => {
       `prnpass0${normDigits}`
     ];
 
-    const pwdMatch = pwdStr && allowedPasswords.includes(pwdStr);
-    return userMatch && roleMatch && pwdMatch;
+    const passwordMatches = allowedPasswords.some(candidate => {
+      return candidate === pwdStr || toHash(candidate) === pwdHash || candidate === c.password;
+    });
+
+    return userMatch && roleMatch && passwordMatches;
   });
 
   const tokenRecord = captchaToken ? captchaStore.get(String(captchaToken)) : undefined;

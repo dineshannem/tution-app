@@ -62,7 +62,16 @@ export default function App() {
     damping: 30,
     restDelta: 0.001
   });
-  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('ssr_active_tab') || 'home');
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = localStorage.getItem('ssr_active_tab') || 'home';
+    const restoredRole = (localStorage.getItem('ssr_role') || 'guest') as string;
+
+    if (saved.startsWith('t_') && restoredRole !== 'teacher') return 't_dashboard';
+    if (saved.startsWith('s_') && restoredRole !== 'student') return 's_dashboard';
+    if (saved.startsWith('p_') && restoredRole !== 'parent') return 'p_dashboard';
+
+    return saved;
+  });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const [isAdmissionModalOpen, setIsAdmissionModalOpen] = useState(false);
@@ -79,10 +88,16 @@ export default function App() {
   }, [activeTab]);
 
   useEffect(() => {
-    if (!user) {
-      setActiveTab(current => current.startsWith('t_') || current.startsWith('s_') || current.startsWith('p_') ? 'home' : current);
+    if (!user && activeTab.startsWith('t_')) {
+      setActiveTab('teacher_login');
     }
-  }, [user]);
+    if (!user && activeTab.startsWith('s_')) {
+      setActiveTab('student_login');
+    }
+    if (!user && activeTab.startsWith('p_')) {
+      setActiveTab('parent_login');
+    }
+  }, [user, activeTab]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -156,7 +171,7 @@ export default function App() {
       case 't_fees':
         return <FeeManagement onSuccessToast={showToast} />;
       case 't_payment_history':
-        return <FeeManagement onSuccessToast={showToast} />;
+        return <TeacherHistory title="Payment History" endpoint="/api/fees" />;
       case 't_approval_history':
         return <TeacherHistory title="Application Approval History" endpoint="/api/admission-requests" />;
       case 't_demo_history':
@@ -256,10 +271,11 @@ export default function App() {
     : '';
 
   return (
-    <div className="h-screen flex flex-col text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-300 overflow-hidden">
+    <div className="min-h-screen flex flex-col text-slate-900 dark:text-slate-100 font-sans selection:bg-teal-500 selection:text-white transition-colors duration-300 overflow-x-hidden">
+      {/* Scroll Progress Bar - Updated to Teal theme */}
       <motion.div
         aria-hidden="true"
-        className="fixed left-0 right-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-indigo-500 via-cyan-400 to-amber-400 shadow-sm"
+        className="fixed left-0 right-0 top-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-teal-500 via-cyan-400 to-emerald-400 shadow-sm"
         style={{ scaleX: scrollScale }}
       />
 
@@ -269,7 +285,7 @@ export default function App() {
       {/* Main Navbar */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} openFreeDemo={openFreeDemo} openAdmission={openAdmission} />
 
-      <div ref={contentScrollRef} className={"portal-main flex-1 min-h-0 overflow-y-auto relative " + contentPaddingClass}>
+      <div ref={contentScrollRef} className={"portal-main flex-1 min-h-0 overflow-y-auto overflow-x-hidden relative " + contentPaddingClass}>
         {/* Dynamic Main View with lightweight motion transitions */}
         <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-5 lg:px-8 py-4 sm:py-6 lg:py-8">
           <AnimatePresence mode="wait">

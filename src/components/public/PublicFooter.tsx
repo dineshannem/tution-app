@@ -14,7 +14,7 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="mt-20 bg-slate-950 text-white border-t border-slate-800"
+      className="mt-20 bg-slate-50 text-slate-900 border-t border-slate-200 dark:bg-slate-950 dark:text-white dark:border-slate-800"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -35,14 +35,14 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
                 <GraduationCap className="w-6 h-6" />
               </motion.div>
               <div>
-                <p className="font-black text-white text-lg leading-tight">SSR TUITION</p>
-                <p className="text-[11px] text-amber-400 font-bold tracking-wide">SINGLE TEACHER EXCELLENCE</p>
+                <p className="font-black text-slate-900 dark:text-white text-lg leading-tight">SSR TUITION</p>
+                <p className="text-[11px] text-amber-700 font-bold tracking-wide dark:text-amber-400">SINGLE TEACHER EXCELLENCE</p>
               </div>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed dark:text-slate-400">
               Dedicated teaching for Classes 1–10 (CBSE & State Board). Personal care by owner-teacher SSR Sir with clear Telugu & English explanation, daily homework checking, and small batch focus.
             </p>
-            <div className="flex items-center gap-2 text-xs text-emerald-400 font-semibold">
+            <div className="flex items-center gap-2 text-xs text-emerald-700 font-semibold dark:text-emerald-400">
               <span className="w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center text-[10px]">✓</span>
               Small Batches (Max 15 Students)
             </div>
@@ -56,8 +56,8 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
             transition={{ delay: 0.2 }}
             className="space-y-4"
           >
-            <h4 className="text-sm font-bold text-white tracking-wide">QUICK NAVIGATION</h4>
-            <div className="flex flex-col gap-2.5 text-xs text-slate-400">
+            <h4 className="text-sm font-bold text-slate-900 tracking-wide dark:text-white">QUICK NAVIGATION</h4>
+            <div className="flex flex-col gap-2.5 text-xs text-slate-600 dark:text-slate-400">
               {[
                 { label: 'Home & Overview', tab: 'home' },
                 { label: 'About SSR Sir (15+ Yrs Exp)', tab: 'about' },
@@ -68,7 +68,7 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
                   key={item.tab}
                   whileHover={{ x: 6, color: '#a5b4fc' }}
                   onClick={() => setActiveTab?.(item.tab)}
-                  className="text-left transition-colors"
+                  className="text-left transition-colors hover:text-indigo-700 dark:hover:text-indigo-300"
                 >
                   {item.label}
                 </motion.button>
@@ -76,14 +76,14 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
               <motion.button
                 whileHover={{ x: 6 }}
                 onClick={openFreeDemo}
-                className="text-left text-amber-400 font-semibold"
+                className="text-left text-amber-700 font-semibold dark:text-amber-400"
               >
                 Book Free Demo Class
               </motion.button>
               <motion.button
                 whileHover={{ x: 6 }}
                 onClick={openAdmission}
-                className="text-left text-indigo-400 font-semibold"
+                className="text-left text-indigo-700 font-semibold dark:text-indigo-400"
               >
                 Apply Online Admission
               </motion.button>
@@ -98,10 +98,10 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
             transition={{ delay: 0.3 }}
             className="space-y-4"
           >
-            <h4 className="text-sm font-bold text-white tracking-wide">CONTACT & LOCATION</h4>
-            <div className="space-y-3 text-xs text-slate-400">
+            <h4 className="text-sm font-bold text-slate-900 tracking-wide dark:text-white">CONTACT & LOCATION</h4>
+            <div className="space-y-3 text-xs text-slate-600 dark:text-slate-400">
               <motion.div whileHover={{ x: 4 }} className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-amber-700 mt-0.5 flex-shrink-0 dark:text-amber-400" />
                 <span>H.No 4-12, Main Road, Near Bus Stop, Hyderabad, Telangana 500038</span>
               </motion.div>
               <motion.a
@@ -109,7 +109,7 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
                 whileHover={{ x: 4, color: '#6ee7b7' }}
                 className="flex items-center gap-2.5"
               >
-                <Phone className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <Phone className="w-4 h-4 text-emerald-700 flex-shrink-0 dark:text-emerald-400" />
                 <span>+91 98765 43210 / +91 91234 56789</span>
               </motion.a>
               <motion.a
@@ -117,11 +117,11 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
                 whileHover={{ x: 4, color: '#a5b4fc' }}
                 className="flex items-center gap-2.5"
               >
-                <Mail className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                <Mail className="w-4 h-4 text-indigo-700 flex-shrink-0 dark:text-indigo-400" />
                 <span>teacher@ssrtuition.com</span>
               </motion.a>
               <motion.div whileHover={{ x: 4 }} className="flex items-start gap-2.5">
-                <Clock className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
+                <Clock className="w-4 h-4 text-sky-700 mt-0.5 flex-shrink-0 dark:text-sky-400" />
                 <span>
                   Mon - Sat: 04:00 PM - 08:30 PM
                   <br />
@@ -139,10 +139,10 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
             transition={{ delay: 0.4 }}
             className="space-y-3"
           >
-            <h4 className="text-sm font-bold text-white tracking-wide">TUITION LOCATION</h4>
+            <h4 className="text-sm font-bold text-slate-900 tracking-wide dark:text-white">TUITION LOCATION</h4>
             <motion.div
               whileHover={{ y: -4, scale: 1.02 }}
-              className="relative rounded-2xl overflow-hidden h-40 bg-slate-800 border border-slate-700 shadow-xl flex items-center justify-center"
+              className="relative rounded-2xl overflow-hidden h-40 bg-slate-200 border border-slate-300 shadow-xl flex items-center justify-center dark:bg-slate-800 dark:border-slate-700"
             >
               <div
                 className="absolute inset-0 bg-cover bg-center opacity-40"
@@ -153,7 +153,7 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
               />
               <div className="relative z-10 text-center space-y-2 px-4">
                 <MapPin className="w-7 h-7 text-rose-500 mx-auto animate-bounce" />
-                <p className="text-xs font-bold text-white">SSR Tuition Learning Center</p>
+                <p className="text-xs font-bold text-slate-900 dark:text-white">SSR Tuition Learning Center</p>
                 <a
                   href="https://maps.google.com"
                   target="_blank"
@@ -173,7 +173,7 @@ export const PublicFooter = ({ setActiveTab, openFreeDemo, openAdmission }: Publ
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500"
+          className="mt-12 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500 dark:border-slate-800 dark:text-slate-500"
         >
           <span>© {new Date().getFullYear()} SSR Tuition. All rights reserved. Designed for Student Success.</span>
           <div className="flex items-center gap-3">

@@ -58,15 +58,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(true);
 
-  // Auto-close mobile menu after 3 seconds
-  useEffect(() => {
-    if (!mobileMenuOpen) return;
-    const timer = setTimeout(() => {
-      setMobileMenuOpen(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [mobileMenuOpen]);
-
   useEffect(() => {
     if (mobileMenuOpen && showThemeMenu) {
       setShowThemeMenu(false);
@@ -245,13 +236,13 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-slate-100 transition-colors shadow-sm w-full max-w-full overflow-x-clip">
       
       {/* Role Switcher Top Bar */}
-      <div className="bg-slate-900 dark:bg-slate-950 text-slate-200 text-xs py-1.5 px-3 sm:px-4 relative border-b border-slate-800/80 dark:border-white/5 backdrop-blur-md w-full max-w-full min-w-0">
+      <div className="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-200 text-xs py-1.5 px-3 sm:px-4 relative border-b border-slate-200/80 dark:border-white/5 backdrop-blur-md w-full max-w-full min-w-0">
         <div className="absolute inset-x-0 flex items-center justify-center pointer-events-none overflow-hidden">
           <div className="flex items-center gap-3 min-w-0 whitespace-nowrap text-center">
-            <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shrink-0">
+            <span className="bg-indigo-100 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider shrink-0 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-400/30">
               SSR Portal Hub
             </span>
-            <span className="text-slate-400 text-[11px] truncate max-w-full hidden sm:inline">
+            <span className="text-slate-500 text-[11px] truncate max-w-full hidden sm:inline dark:text-slate-400">
               Switch role to test portals or view public site
             </span>
           </div>
@@ -263,7 +254,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`rounded-lg transition-all whitespace-nowrap ${
               role === 'guest'
                 ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-indigo-600 text-white shadow-md shadow-indigo-500/25 border border-indigo-400/40'
-                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
+                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 dark:text-slate-400 dark:hover:text-white dark:bg-white/5 dark:hover:bg-white/10'
             }`}
           >
             Public Site
@@ -273,7 +264,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`rounded-lg transition-all whitespace-nowrap ${
               role === 'teacher'
                 ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-amber-500 text-slate-950 shadow-md shadow-amber-500/25 border border-amber-300/60'
-                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
+                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 dark:text-slate-400 dark:hover:text-white dark:bg-white/5 dark:hover:bg-white/10'
             }`}
           >
             Teacher Control
@@ -283,7 +274,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`rounded-lg transition-all whitespace-nowrap ${
               role === 'student'
                 ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25 border border-emerald-300/60'
-                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
+                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 dark:text-slate-400 dark:hover:text-white dark:bg-white/5 dark:hover:bg-white/10'
             }`}
           >
             Student Portal
@@ -293,7 +284,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`rounded-lg transition-all whitespace-nowrap ${
               role === 'parent'
                 ? 'px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-black bg-purple-500 text-white shadow-md shadow-purple-500/25 border border-purple-300/50'
-                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-400 hover:text-white bg-white/5 hover:bg-white/10'
+                : 'px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 dark:text-slate-400 dark:hover:text-white dark:bg-white/5 dark:hover:bg-white/10'
             }`}
           >
             Parent Portal
@@ -681,7 +672,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Guest Horizontal Nav */}
       {role === 'guest' && (
-        <div className="bg-slate-900 dark:bg-slate-950 border-t border-slate-800/60 dark:border-white/5 px-2 sm:px-4 py-1.5 w-full max-w-full min-w-0 overflow-hidden">
+        <div className="bg-slate-50 text-slate-700 border-t border-slate-200/80 dark:bg-slate-950 dark:text-slate-100 dark:border-white/5 px-2 sm:px-4 py-1.5 w-full max-w-full min-w-0 overflow-hidden">
           <div className="relative max-w-7xl mx-auto flex items-center min-w-0 w-full">
             
             {showLeftScroll && (
@@ -695,7 +686,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
 
             {showLeftScroll && (
-              <div className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-slate-900 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
+              <div className="lg:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-slate-100 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
             )}
 
             <nav
@@ -712,10 +703,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                     className={`px-3 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 shrink-0 ${
                       isActive
                         ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25 ring-1 ring-indigo-400/50'
-                        : 'text-slate-400 hover:text-white hover:bg-white/10'
+                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/10'
                     }`}
                   >
-                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-slate-500'}`} />
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-amber-300' : 'text-slate-500 dark:text-slate-500'}`} />
                     <span>{item.label}</span>
                   </button>
                 );
@@ -723,7 +714,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </nav>
 
             {showRightScroll && (
-              <div className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-900 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
+              <div className="lg:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-100 dark:from-slate-950 to-transparent z-10 pointer-events-none" />
             )}
 
             {showRightScroll && (
@@ -738,7 +729,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-0.5 bg-slate-800/80 rounded-full mt-1 overflow-hidden">
+          <div className="w-full h-0.5 bg-slate-200 dark:bg-slate-800/80 rounded-full mt-1 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-amber-400 transition-all duration-150"
               style={{ width: `${Math.max(15, scrollPercent)}%` }}

@@ -100,41 +100,45 @@ export const PublicContact: React.FC<PublicContactProps> = ({ onSuccessToast }) 
             transition={{ duration: 2 }}
             className="lg:col-span-5 space-y-6"
           >
-            <div className="bg-slate-900 text-white p-8 rounded-3xl space-y-6 shadow-xl border border-slate-800">
-              <h2 className="text-xl font-bold">Contact Details</h2>
+            <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white p-8 rounded-3xl space-y-6 shadow-xl border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-xl font-black text-slate-900 dark:text-white">Contact Details</h2>
+                <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300">
+                  Open Daily
+                </span>
+              </div>
 
-              <div className="space-y-4 text-xs text-slate-300">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300">
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                  <MapPin className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-white block text-sm">Center Address</span>
+                    <span className="font-black text-slate-900 dark:text-white block text-sm">Center Address</span>
                     <span>H.No 4-12, Main Road, Near Bus Stop, Hyderabad, Telangana 500038</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                  <Phone className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                   <div>
-                    <span className="font-bold text-white block text-sm">Direct Phone / WhatsApp</span>
+                    <span className="font-black text-slate-900 dark:text-white block text-sm">Direct Phone / WhatsApp</span>
                     <span>+91 98765 43210 / +91 91234 56789</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                  <Mail className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
                   <div>
-                    <span className="font-bold text-white block text-sm">Email Address</span>
+                    <span className="font-black text-slate-900 dark:text-white block text-sm">Email Address</span>
                     <span>teacher@ssrtuition.com</span>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                  <Clock className="w-5 h-5 text-sky-600 dark:text-sky-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-white block text-sm">Batch Hours</span>
+                    <span className="font-black text-slate-900 dark:text-white block text-sm">Batch Hours</span>
                     <span>
-                      Mon - Sat: 04:00 PM - 08:30 PM
-                      <br />
+                      Mon - Sat: 04:00 PM - 08:30 PM<br />
                       Sunday: Doubts & Special Revision
                     </span>
                   </div>
@@ -143,7 +147,7 @@ export const PublicContact: React.FC<PublicContactProps> = ({ onSuccessToast }) 
             </div>
 
             {/* Map Card */}
-            <div className="rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-lg h-64 bg-slate-800 relative flex items-center justify-center p-6 text-center">
+            <div className="rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-lg h-64 bg-slate-200 dark:bg-slate-800 relative flex items-center justify-center p-6 text-center">
               <div
                 className="absolute inset-0 bg-cover bg-center opacity-40"
                 style={{
@@ -151,14 +155,14 @@ export const PublicContact: React.FC<PublicContactProps> = ({ onSuccessToast }) 
                     "url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&auto=format&fit=crop&q=80')"
                 }}
               />
-              <div className="relative z-10 space-y-2 bg-slate-900/80 backdrop-blur-md p-5 rounded-2xl border border-slate-700">
+              <div className="relative z-10 space-y-2 bg-white/90 dark:bg-slate-950/80 backdrop-blur-md p-5 rounded-2xl border border-slate-200 dark:border-slate-700">
                 <MapPin className="w-7 h-7 text-rose-500 mx-auto animate-bounce" />
-                <h4 className="text-xs font-bold text-white">SSR Tuition Hyderabad Center</h4>
+                <h4 className="text-xs font-black text-slate-900 dark:text-white">SSR Tuition Hyderabad Center</h4>
                 <a
                   href="https://maps.google.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-block text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-xl transition-colors shadow"
+                  className="inline-block text-xs font-black bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-xl transition-colors shadow"
                 >
                   Open Google Maps
                 </a>

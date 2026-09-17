@@ -1,0 +1,319 @@
+/* =============================================================
+   SSR Tuition - Responsive / Multi-screen adaptation layer
+   (Improved – reduces overlapping content)
+   ============================================================= */
+
+:root {
+  --app-max-width: 1400px;
+  --font-size-base: 16px;
+  --font-size-small: 14px;
+  --font-size-xsmall: 13px;
+  --section-gap: 1.5rem;
+  --card-gap: 1rem;
+}
+
+/* Reset and soft global adaptation */
+html {
+  font-size: var(--font-size-base);
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-frame,
+.portal-main,
+.public-page,
+main {
+  max-width: 100%;
+  min-width: 0; /* critical for flex/grid children */
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Public page fundamentals */
+.public-page {
+  width: min(100%, var(--app-max-width));
+  max-width: 100%;
+  margin-inline: auto;
+  overflow-wrap: anywhere;
+  padding-inline: 1rem;
+}
+
+.public-page .grid {
+  width: 100%;
+  gap: var(--card-gap);
+}
+
+/* Responsive hero/home adjustments */
+.public-page > section:first-child {
+  min-width: 0;
+}
+
+.public-page section {
+  width: 100%;
+  min-width: 0;
+}
+
+/* =============================================================
+   Desktop / large tablet
+   ============================================================= */
+@media (max-width: 1199px) {
+  .public-page {
+    width: min(100%, 1100px);
+  }
+
+  .public-page section,
+  .public-page > section {
+    padding-left: clamp(1rem, 3vw, 2rem);
+    padding-right: clamp(1rem, 3vw, 2rem);
+  }
+}
+
+/* =============================================================
+   Small tablet & large mobile
+   ============================================================= */
+@media (max-width: 960px) {
+  html {
+    font-size: 15px;
+  }
+
+  .public-page {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Force grids to single column safely */
+  .public-page .grid,
+  .public-page [class*="grid-cols-"]:not(.grid-cols-1) {
+    grid-template-columns: 1fr !important;
+    gap: var(--card-gap);
+  }
+
+  .public-page section {
+    border-radius: 1.25rem;
+    margin-bottom: var(--section-gap);
+  }
+
+  main {
+    max-width: 100%;
+    padding-inline: 0.75rem;
+  }
+
+  .portal-main {
+    overflow-x: hidden;
+  }
+
+  /* Prevent flex children from overlapping */
+  .public-page .flex,
+  .public-page .flex-wrap {
+    gap: 0.75rem;
+  }
+}
+
+/* =============================================================
+   Main small-mobile adjustment
+   ============================================================= */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  .public-page {
+    width: 100%;
+    margin: 0 auto;
+    padding-inline: 0.75rem;
+  }
+
+  .public-page > section {
+    margin: 0 0 1.25rem;
+    padding: 1.25rem 1rem;
+  }
+
+  /* Typography – more conservative to avoid overflow */
+  .public-page h1,
+  .public-page h2,
+  .public-page h3 {
+    font-size: clamp(1.5rem, 7vw, 2.25rem);
+    line-height: 1.25;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .public-page p,
+  .public-page span,
+  .public-page li {
+    font-size: clamp(0.82rem, 3.2vw, 0.95rem);
+    line-height: 1.5;
+  }
+
+  .public-page button,
+  .public-page a,
+  .public-page input,
+  .public-page textarea,
+  .public-page select {
+    font-size: clamp(0.8rem, 3.2vw, 0.9rem);
+  }
+
+  /* Hero */
+  .public-page section:first-child {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Spacing utilities – reduce vertical collisions */
+  .public-page .space-y-6 > * + *,
+  .public-page .space-y-8 > * + *,
+  .public-page .space-y-12 > * + * {
+    margin-top: 0.85rem !important;
+  }
+
+  .public-page .rounded-3xl,
+  .public-page .rounded-2xl {
+    border-radius: 1rem;
+  }
+
+  /* Safer CTA / flex stacking – only when needed */
+  .public-page .flex-wrap.cta-group,
+  .public-page .cta-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .public-page .flex-wrap.cta-group > *,
+  .public-page .cta-row > * {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* General flex safety */
+  .public-page .flex {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .public-page .grid {
+    gap: 1rem;
+  }
+}
+
+/* =============================================================
+   Extra small mobile devices
+   ============================================================= */
+@media (max-width: 420px) {
+  html {
+    font-size: 13px;
+  }
+
+  .public-page {
+    padding-inline: 0.6rem;
+  }
+
+  .public-page > section {
+    padding: 1rem 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .public-page h1,
+  .public-page h2,
+  .public-page h3 {
+    font-size: clamp(1.35rem, 8.5vw, 1.9rem);
+  }
+
+  .public-page .text-3xl {
+    font-size: 1.65rem;
+  }
+
+  .public-page .text-4xl {
+    font-size: 1.9rem;
+  }
+
+  .public-page .w-96,
+  .public-page .h-96 {
+    width: min(100%, 16rem);
+    height: auto;
+  }
+
+  .public-page .grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .public-page .hidden-xs {
+    display: none !important;
+  }
+}
+
+/* =============================================================
+   Image & card safety (prevents overflow / overlap)
+   ============================================================= */
+@media (max-width: 960px) {
+  .public-page img {
+    height: auto;
+    max-height: none;
+    object-fit: cover;
+  }
+
+  .public-page .rounded-3xl,
+  .public-page .rounded-2xl,
+  .public-page .overflow-hidden {
+    overflow: hidden;
+  }
+
+  /* Cards should not overflow their container */
+  .public-page .card,
+  .public-page [class*="rounded-"] {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+/* =============================================================
+   Safe area support (iPhone notch / home indicator)
+   ============================================================= */
+@supports (padding: max(0px)) {
+  .public-page {
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+  }
+
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* =============================================================
+   Utility helpers to prevent future overlaps
+   ============================================================= */
+.public-page .min-w-0 {
+  min-width: 0;
+}
+
+.public-page .break-words {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
